@@ -47,4 +47,3 @@ jobs:
         tags: |
           ${{ steps.tag-creator.outputs.DOCKER_HUB_TAG }}
           lancemccarthy/secretsmocker:latest
-          

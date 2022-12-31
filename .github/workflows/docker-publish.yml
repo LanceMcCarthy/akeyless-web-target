@@ -40,7 +40,7 @@ jobs:
     - name: Build and push to Docker Hub
       uses: docker/build-push-action@v3
       with:
-        context: src/SecretsMocker
+        context: src/SecretsMocker/SecretsMocker
         push: true
         secrets: |
           telerik_key=${{ secrets.TELERIK_NUGET_KEY }}

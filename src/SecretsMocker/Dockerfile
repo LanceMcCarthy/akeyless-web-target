@@ -8,8 +8,8 @@ WORKDIR "/src/SecretsMocker/SecretsMocker"
 COPY . .
 RUN --mount=type=secret,id=telerik_key \
   echo $(cat /run/secrets/telerik_key) \
-  && dotnet nuget update source "Telerik_Feed" -s "https://nuget.telerik.com/v3/index.json" -u "api-key" -p $(cat /run/secrets/telerik_key) --configfile "./NuGet.Config" --store-password-in-clear-text \
-  && dotnet restore "SecretsMocker.csproj" --configfile "./NuGet.Config" \
+  && dotnet nuget update source "Telerik_Feed" -s "https://nuget.telerik.com/v3/index.json" -u "api-key" -p $(cat /run/secrets/telerik_key) --configfile "./nuget.config" --store-password-in-clear-text \
+  && dotnet restore "SecretsMocker.csproj" --configfile "./nuget.config" \
   && dotnet build "SecretsMocker.csproj" -c Release -o /app/build
 
 FROM build AS publish

@@ -1,0 +1,10 @@
+# To use this app after it has been published to DockerHub, run:
+# "sudo docker compose up"  (or in legacy systems "docker-compose up")
+version: '3.8'
+services:
+  app:
+    image: 'lancemccarthy/secretsmocker:latest'
+    restart: unless-stopped
+    ports:
+      - '880:80'
+      - '4443:443'

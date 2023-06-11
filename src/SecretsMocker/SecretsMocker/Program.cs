@@ -14,7 +14,10 @@ app.UseCors(x => x
     .AllowAnyHeader());
 
 app.UseSwagger();
-app.UseSwaggerUI();
+app.UseSwaggerUI(c =>
+{
+    c.RoutePrefix = "";
+});
 
 app.UseHttpsRedirection();
 

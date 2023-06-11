@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Rewrite;
 using SecretsMocker.Authorization;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -14,10 +15,7 @@ app.UseCors(x => x
     .AllowAnyHeader());
 
 app.UseSwagger();
-app.UseSwaggerUI(c =>
-{
-    c.RoutePrefix = "";
-});
+app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
 
@@ -27,5 +25,9 @@ app.UseAuthorization();
 app.UseMiddleware<AkeylessAuthMiddleware>();
 
 app.MapControllers();
+
+var option = new RewriteOptions();
+option.AddRedirect("^$", "swagger/index.html");
+app.UseRewriter(option);
 
 app.Run();

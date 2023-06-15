@@ -30,12 +30,14 @@ namespace SecretsMocker.Controllers
         [AllowAnonymous]
         [Route("revoke")]
         [HttpPost]
-        public AkeylessRevokeOutput Revoke([FromBody] AkeylessRevokeInput input) // AkeylessRevokeInput has special empty/null payload handler for dry-run test from Akeyless gateway
+        public AkeylessRevokeOutput Revoke([FromBody] AkeylessRevokeInput input)
         {
+            var ids = input == null ? new List<string>{ "dry-run-id" } : input.Ids;
+
             return new AkeylessRevokeOutput()
             {
-                Revoked = input.Ids,
-                Message = "All items have been removed"
+                Revoked = ids,
+                Message = "Successfully revoked."
             };
         }
 

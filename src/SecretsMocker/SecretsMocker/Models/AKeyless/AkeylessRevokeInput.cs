@@ -12,24 +12,31 @@ public class AkeylessRevokeInput
     [JsonProperty("ids")]
     public List<string> Ids { get; set; }
 
-    public static AkeylessRevokeInput FromJson(string json) => JsonConvert.DeserializeObject<AkeylessRevokeInput>(json, new JsonSerializerSettings
+    public static AkeylessRevokeInput FromJson(string json)
     {
-        MetadataPropertyHandling = MetadataPropertyHandling.Ignore,
-        DateParseHandling = DateParseHandling.None,
-        Converters =
-        {
-            new IsoDateTimeConverter { DateTimeStyles = DateTimeStyles.AssumeUniversal }
-        },
-    });
+        if(string.IsNullOrEmpty(json))
+            return new AkeylessRevokeInput{Ids = new List<string>{"dry-run"}};
+        else
+            return JsonConvert.DeserializeObject<AkeylessRevokeInput>(json, new JsonSerializerSettings
+            {
+                MetadataPropertyHandling = MetadataPropertyHandling.Ignore,
+                DateParseHandling = DateParseHandling.None,
+                Converters =
+                {
+                    new IsoDateTimeConverter { DateTimeStyles = DateTimeStyles.AssumeUniversal }
+                }
+            });
+    }
 
     public string ToJson() => JsonConvert.SerializeObject(this, new JsonSerializerSettings
     {
         MetadataPropertyHandling = MetadataPropertyHandling.Ignore,
         DateParseHandling = DateParseHandling.None,
+        NullValueHandling = NullValueHandling.Ignore,
         Converters =
         {
             new IsoDateTimeConverter { DateTimeStyles = DateTimeStyles.AssumeUniversal }
-        },
+        }
     });
 }
 

@@ -1,13 +1,19 @@
 using Microsoft.AspNetCore.Rewrite;
 using SecretsMocker.Authorization;
+using SecretsMocker.Models.AKeyless;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers(options =>
 {
     options.AllowEmptyInputInBodyModelBinding = true;
+}).AddJsonOptions(options =>
+{
+    options.AllowInputFormatterExceptionMessages = true;
 });
+
 builder.Services.AddEndpointsApiExplorer();
+
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();

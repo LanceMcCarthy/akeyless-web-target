@@ -1,13 +1,14 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
 
 namespace SecretsMocker.Models.AKeyless;
 
 public class AkeylessRevokeInput
 {
-    [JsonPropertyName("payload")]
+    [JsonPropertyName("payload"), AllowNull]
     public string Payload { get; set; }
 
-    [JsonPropertyName("ids")]
+    [JsonPropertyName("ids"), AllowNull]
     public List<string> Ids { get; set; }
 }
 

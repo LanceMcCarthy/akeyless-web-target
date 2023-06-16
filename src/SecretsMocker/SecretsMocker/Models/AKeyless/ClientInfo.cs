@@ -1,12 +1,12 @@
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace SecretsMocker.Models.AKeyless;
 
 public class ClientInfo
 {
-    [JsonProperty("access_id")]
+    [JsonPropertyName("access_id")]
     public string AccessId { get; set; }
 
-    [JsonProperty("sub_claims")]
+    [JsonPropertyName("sub_claims")]
     public SubClaims SubClaims { get; set; }
 }

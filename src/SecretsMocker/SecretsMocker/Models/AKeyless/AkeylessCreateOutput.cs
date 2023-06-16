@@ -1,37 +1,14 @@
-using System.Globalization;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
+using System.Text.Json.Serialization;
 
 namespace SecretsMocker.Models.AKeyless;
 
 public class AkeylessCreateOutput
 {
-    [JsonProperty("id")]
+    [JsonPropertyName("id")]
     public string Id { get; set; }
 
-    [JsonProperty("response")]
+    [JsonPropertyName("response")]
     public string Response { get; set; }
-
-    public static AkeylessCreateOutput FromJson(string json) => JsonConvert.DeserializeObject<AkeylessCreateOutput>(json, new JsonSerializerSettings
-    {
-        MetadataPropertyHandling = MetadataPropertyHandling.Ignore,
-        DateParseHandling = DateParseHandling.None,
-        Converters =
-        {
-            new IsoDateTimeConverter { DateTimeStyles = DateTimeStyles.AssumeUniversal }
-        },
-    });
-
-    public string ToJson() => JsonConvert.SerializeObject(this, new JsonSerializerSettings
-    {
-        MetadataPropertyHandling = MetadataPropertyHandling.Ignore,
-        DateParseHandling = DateParseHandling.None,
-        Converters =
-        {
-            new IsoDateTimeConverter { DateTimeStyles = DateTimeStyles.AssumeUniversal }
-        },
-    });
-
 }
 
 //id

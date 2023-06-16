@@ -1,33 +1,11 @@
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
-using System.Globalization;
+using System.Text.Json.Serialization;
 
 namespace SecretsMocker.Models.AKeyless;
 
 public class AkeylessRotateOutput
 {
-    [JsonProperty("payload")]
+    [JsonPropertyName("payload")]
     public string Payload { get; set; }
-
-    public static AkeylessRotateOutput FromJson(string json) => JsonConvert.DeserializeObject<AkeylessRotateOutput>(json, new JsonSerializerSettings
-    {
-        MetadataPropertyHandling = MetadataPropertyHandling.Ignore,
-        DateParseHandling = DateParseHandling.None,
-        Converters =
-        {
-            new IsoDateTimeConverter { DateTimeStyles = DateTimeStyles.AssumeUniversal }
-        },
-    });
-
-    public string ToJson() => JsonConvert.SerializeObject(this, new JsonSerializerSettings
-    {
-        MetadataPropertyHandling = MetadataPropertyHandling.Ignore,
-        DateParseHandling = DateParseHandling.None,
-        Converters =
-        {
-            new IsoDateTimeConverter { DateTimeStyles = DateTimeStyles.AssumeUniversal }
-        },
-    });
 }
 
 //payload

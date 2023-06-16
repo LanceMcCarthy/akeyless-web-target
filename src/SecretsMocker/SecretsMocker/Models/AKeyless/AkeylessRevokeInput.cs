@@ -1,37 +1,14 @@
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
-using System.Globalization;
+using System.Text.Json.Serialization;
 
 namespace SecretsMocker.Models.AKeyless;
 
 public class AkeylessRevokeInput
 {
-    [JsonProperty("payload")]
+    [JsonPropertyName("payload")]
     public string Payload { get; set; }
 
-    [JsonProperty("ids")]
+    [JsonPropertyName("ids")]
     public List<string> Ids { get; set; }
-
-    public static AkeylessRevokeInput FromJson(string json) => JsonConvert.DeserializeObject<AkeylessRevokeInput>(json, new JsonSerializerSettings
-    {
-        MetadataPropertyHandling = MetadataPropertyHandling.Ignore,
-        DateParseHandling = DateParseHandling.None,
-        Converters =
-        {
-            new IsoDateTimeConverter { DateTimeStyles = DateTimeStyles.AssumeUniversal }
-        }
-    });
-
-    public string ToJson() => JsonConvert.SerializeObject(this, new JsonSerializerSettings
-    {
-        MetadataPropertyHandling = MetadataPropertyHandling.Ignore,
-        DateParseHandling = DateParseHandling.None,
-        NullValueHandling = NullValueHandling.Ignore,
-        Converters =
-        {
-            new IsoDateTimeConverter { DateTimeStyles = DateTimeStyles.AssumeUniversal }
-        }
-    });
 }
 
 //payload(Optional)

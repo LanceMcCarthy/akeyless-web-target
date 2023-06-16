@@ -1,39 +1,17 @@
-using System.Globalization;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
+using System.Text.Json.Serialization;
 
 namespace SecretsMocker.Models.AKeyless;
 
 public class AkeylessCreds
 {
-    [JsonProperty("creds")]
+    [JsonPropertyName("creds")]
     public string Creds { get; set; }
 
-    [JsonProperty("expected_access_id")]
+    [JsonPropertyName("expected_access_id")]
     public string ExpectedAccessId { get; set; }
 
-    [JsonProperty("expected_item_name")]
+    [JsonPropertyName("expected_item_name")]
     public string ExpectedItemName { get; set; }
-
-    public static AkeylessCreds FromJson(string json) => JsonConvert.DeserializeObject<AkeylessCreds>(json, new JsonSerializerSettings
-    {
-        MetadataPropertyHandling = MetadataPropertyHandling.Ignore,
-        DateParseHandling = DateParseHandling.None,
-        Converters =
-        {
-            new IsoDateTimeConverter { DateTimeStyles = DateTimeStyles.AssumeUniversal }
-        },
-    });
-
-    public string ToJson() => JsonConvert.SerializeObject(this, new JsonSerializerSettings
-    {
-        MetadataPropertyHandling = MetadataPropertyHandling.Ignore,
-        DateParseHandling = DateParseHandling.None,
-        Converters =
-        {
-            new IsoDateTimeConverter { DateTimeStyles = DateTimeStyles.AssumeUniversal }
-        },
-    });
 }
 
 //creds

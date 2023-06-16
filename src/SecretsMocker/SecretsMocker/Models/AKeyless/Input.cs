@@ -1,9 +1,9 @@
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace SecretsMocker.Models.AKeyless;
 
 public class Input
 {
-    [JsonProperty("user")]
+    [JsonPropertyName("user")]
     public string User { get; set; }
 }

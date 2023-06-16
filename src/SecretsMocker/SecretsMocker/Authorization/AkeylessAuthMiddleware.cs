@@ -1,4 +1,5 @@
-﻿using SecretsMocker.Models.AKeyless;
+﻿using System.Text.Json;
+using SecretsMocker.Models.AKeyless;
 
 namespace SecretsMocker.Authorization;
 
@@ -16,14 +17,17 @@ public class AkeylessAuthMiddleware
         try
         {
             string authHeader = context.Request.Headers["Authorization"];
-            
-            var akeylessProducerCredentials = AkeylessCreds.FromJson(authHeader);
 
-            // "p-1234"
+            var bytes = Convert.FromBase64String(authHeader);
+
+            using var stream = new MemoryStream(bytes);
+
+            var akeylessProducerCredentials = await JsonSerializer.DeserializeAsync<AkeylessCreds>(stream);
+            
+            // "p-1234" or "p-custom" for dry-run
             var accessId = akeylessProducerCredentials.ExpectedAccessId;
 
             context.Items["expectedId"] = accessId;
-
         }
         catch
         {

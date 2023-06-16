@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SecretsMocker.Authorization;
 using SecretsMocker.Models.AKeyless;
+using System.Text;
 
 namespace SecretsMocker.Controllers
 {
@@ -20,24 +21,69 @@ namespace SecretsMocker.Controllers
         [HttpPost]
         public AkeylessCreateOutput Create([FromBody] AkeylessCreateInput input)
         {
-            return new AkeylessCreateOutput()
+            var generateId = GenerateId();
+            knownIds.Add(generateId);
+
+            return new AkeylessCreateOutput
             {
-                Id = "1234",
-                Response = @"{ ""cert"":""abcdefghijklmnop"", ""private_key"":""qrstuvwyznowiknowmyabcs"" }"
+                Id = generateId,
+                Response = @"{ ""cert"":""abcdefghijklmnopqrstuvwyz"", ""private_key"":""abcdefghijklmnopqrstuvwyz-now-i-know-my-abcs"" }"
             };
         }
-
+        
         [AllowAnonymous]
         [Route("revoke")]
         [HttpPost]
         public AkeylessRevokeOutput Revoke([FromBody] AkeylessRevokeInput input)
         {
-            var ids = input == null ? new List<string>{ "dry-run-id" } : input.Ids;
+            // PREP //
 
-            return new AkeylessRevokeOutput()
+            // In case of empty request, for example a dry-run from the Akeyless gateway.
+            if (input?.Ids == null)
             {
-                Revoked = ids,
-                Message = "Successfully revoked."
+                return new AkeylessRevokeOutput
+                {
+                    Revoked = new List<string> { "p-custom" },
+                    Message = "Empty request, no credentials were revoked."
+                };
+            }
+            
+            // prepare input data
+            var matchedIds = new List<string>();
+            var missingIds = new List<string>();
+
+            input.Ids.ForEach((id =>
+            {
+                if (knownIds.Contains(id))
+                    matchedIds.Add(id);
+                else
+                    missingIds.Add(id);
+            }));
+            
+
+            // ACTIONS //
+
+            var sb = new StringBuilder(string.Empty);
+            
+            // Handle removals
+            matchedIds.ForEach(id => knownIds.Remove(id));
+
+            // Handle "unremovables"
+            if (missingIds.Count > 0)
+            {
+                sb.Append("Warning. ID(s): ");
+                sb.AppendJoin(",", missingIds);
+                sb.Append(" were not removed. User(s) not found.");
+            }
+            
+
+            // RESPOND //
+            
+            // Return result
+            return new AkeylessRevokeOutput
+            {
+                Revoked = matchedIds,
+                Message = sb.ToString() 
             };
         }
 
@@ -46,13 +92,25 @@ namespace SecretsMocker.Controllers
         [HttpPost]
         public AkeylessRotateOutput Rotate([FromBody] AkeylessRotateInput input)
         {
-            var inputPayloadToFindAndUpdate = input.Payload;
-            var newPayload = $"NEW-{inputPayloadToFindAndUpdate}-NEW";
+            var newPayload = $"UPDATED at {DateTime.UtcNow.Ticks} - {input.Payload}";
 
-            return new AkeylessRotateOutput()
+            return new AkeylessRotateOutput
             {
                 Payload = newPayload
             };
         }
+
+        #region Mock services for credential generator/revoker
+        
+        private readonly Random rand = new();
+        private readonly List<string> knownIds = new(){ "p-1234", "dry-run", "p-custom" };
+
+        public string GenerateId()
+        {
+            var suffix = new string(Enumerable.Repeat("ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789", 6).Select(s => s[rand.Next(s.Length)]).ToArray());
+            return $"p-{suffix}";
+        }
+
+        #endregion
     }
 }

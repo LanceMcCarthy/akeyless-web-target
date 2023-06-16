@@ -2,6 +2,7 @@
 using SecretsMocker.Authorization;
 using SecretsMocker.Models.AKeyless;
 using System.Text;
+using SecretsMocker.Helpers;
 
 namespace SecretsMocker.Controllers
 {
@@ -10,6 +11,8 @@ namespace SecretsMocker.Controllers
     [ApiController]
     public class SyncController : ControllerBase
     {
+        private readonly List<string> knownIds = new(){ "p-1234", "dry-run", "p-custom" };
+
         [HttpGet]
         public string Get()
         {
@@ -21,7 +24,7 @@ namespace SecretsMocker.Controllers
         [HttpPost]
         public AkeylessCreateOutput Create([FromBody] AkeylessCreateInput input)
         {
-            var generateId = GenerateId();
+            var generateId = MockHelpers.GenerateId();
             knownIds.Add(generateId);
 
             return new AkeylessCreateOutput
@@ -99,18 +102,5 @@ namespace SecretsMocker.Controllers
                 Payload = newPayload
             };
         }
-
-        #region Mock services for credential generator/revoker
-        
-        private readonly Random rand = new();
-        private readonly List<string> knownIds = new(){ "p-1234", "dry-run", "p-custom" };
-
-        public string GenerateId()
-        {
-            var suffix = new string(Enumerable.Repeat("ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789", 6).Select(s => s[rand.Next(s.Length)]).ToArray());
-            return $"p-{suffix}";
-        }
-
-        #endregion
     }
 }

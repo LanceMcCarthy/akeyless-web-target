@@ -1,13 +1,14 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
 
 namespace SecretsMocker.Models.AKeyless;
 
 public class AkeylessCreateOutput
 {
-    [JsonPropertyName("id")]
+    [JsonPropertyName("id"), AllowNull]
     public string Id { get; set; }
 
-    [JsonPropertyName("response")]
+    [JsonPropertyName("response"), AllowNull]
     public string Response { get; set; }
 }
 

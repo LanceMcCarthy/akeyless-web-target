@@ -1,10 +1,11 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
 
 namespace SecretsMocker.Models.AKeyless;
 
 public class AkeylessRotateInput
 {
-    [JsonPropertyName("payload")]
+    [JsonPropertyName("payload"), AllowNull]
     public string Payload { get; set; }
 }
 

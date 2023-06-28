@@ -1,16 +1,17 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
 
 namespace SecretsMocker.Models.AKeyless;
 
 public class AkeylessCreateInput
 {
-    [JsonPropertyName("payload")]
+    [JsonPropertyName("payload"), AllowNull]
     public string Payload { get; set; }
 
-    [JsonPropertyName("input")]
+    [JsonPropertyName("input"), AllowNull]
     public Input Input { get; set; }
 
-    [JsonPropertyName("client_info")]
+    [JsonPropertyName("client_info"), AllowNull]
     public ClientInfo ClientInfo { get; set; }
 }
 

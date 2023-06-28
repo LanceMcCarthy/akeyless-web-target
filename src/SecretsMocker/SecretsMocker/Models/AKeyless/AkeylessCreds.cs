@@ -1,16 +1,17 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
 
 namespace SecretsMocker.Models.AKeyless;
 
 public class AkeylessCreds
 {
-    [JsonPropertyName("creds")]
+    [JsonPropertyName("creds"), AllowNull]
     public string Creds { get; set; }
 
-    [JsonPropertyName("expected_access_id")]
+    [JsonPropertyName("expected_access_id"), AllowNull]
     public string ExpectedAccessId { get; set; }
 
-    [JsonPropertyName("expected_item_name")]
+    [JsonPropertyName("expected_item_name"), AllowNull]
     public string ExpectedItemName { get; set; }
 }
 

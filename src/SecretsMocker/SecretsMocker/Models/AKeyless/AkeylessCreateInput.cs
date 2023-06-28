@@ -5,13 +5,16 @@ namespace SecretsMocker.Models.AKeyless;
 
 public class AkeylessCreateInput
 {
-    [JsonPropertyName("payload"), AllowNull]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("payload")]
     public string Payload { get; set; }
 
-    [JsonPropertyName("input"), AllowNull]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("input")]
     public Input Input { get; set; }
 
-    [JsonPropertyName("client_info"), AllowNull]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("client_info")]
     public ClientInfo ClientInfo { get; set; }
 }
 

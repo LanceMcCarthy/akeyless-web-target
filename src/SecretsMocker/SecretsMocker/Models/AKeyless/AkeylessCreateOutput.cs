@@ -5,10 +5,12 @@ namespace SecretsMocker.Models.AKeyless;
 
 public class AkeylessCreateOutput
 {
-    [JsonPropertyName("id"), AllowNull]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("id")]
     public string Id { get; set; }
 
-    [JsonPropertyName("response"), AllowNull]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("response")]
     public string Response { get; set; }
 }
 

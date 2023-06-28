@@ -5,13 +5,16 @@ namespace SecretsMocker.Models.AKeyless;
 
 public class AkeylessCreds
 {
-    [JsonPropertyName("creds"), AllowNull]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("creds")]
     public string Creds { get; set; }
 
-    [JsonPropertyName("expected_access_id"), AllowNull]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("expected_access_id")]
     public string ExpectedAccessId { get; set; }
 
-    [JsonPropertyName("expected_item_name"), AllowNull]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("expected_item_name")]
     public string ExpectedItemName { get; set; }
 }
 

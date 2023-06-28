@@ -5,10 +5,12 @@ namespace SecretsMocker.Models.AKeyless;
 
 public class AkeylessRevokeOutput
 {
-    [JsonPropertyName("revoked"), AllowNull]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("revoked")]
     public List<string> Revoked { get; set; }
 
-    [JsonPropertyName("message"), AllowNull]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("message")]
     public string Message { get; set; }
 }
 

@@ -5,9 +5,11 @@ namespace SecretsMocker.Models.AKeyless;
 
 public class ClientInfo
 {
-    [JsonPropertyName("access_id"), AllowNull]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("access_id")]
     public string AccessId { get; set; }
 
-    [JsonPropertyName("sub_claims"), AllowNull]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("sub_claims")]
     public SubClaims SubClaims { get; set; }
 }

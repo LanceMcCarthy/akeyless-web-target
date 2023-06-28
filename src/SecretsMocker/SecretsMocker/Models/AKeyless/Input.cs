@@ -5,6 +5,7 @@ namespace SecretsMocker.Models.AKeyless;
 
 public class Input
 {
-    [JsonPropertyName("user"), AllowNull]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("user")]
     public string User { get; set; }
 }

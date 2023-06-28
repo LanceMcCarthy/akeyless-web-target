@@ -5,8 +5,7 @@ namespace SecretsMocker.Models.AKeyless;
 
 public class AkeylessRotateOutput
 {
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    [JsonPropertyName("payload")]
+    [JsonPropertyName("payload"), AllowNull]
     public string Payload { get; set; }
 }
 

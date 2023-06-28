@@ -1,15 +1,15 @@
+using SecretsMocker.Models.Converters;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
 
 namespace SecretsMocker.Models.AKeyless;
 
+[JsonConverter(typeof(ClientInfoConverter))]
 public class ClientInfo
 {
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    [JsonPropertyName("access_id")]
+    [JsonPropertyName("access_id"), AllowNull]
     public string AccessId { get; set; }
-
-    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    [JsonPropertyName("sub_claims")]
+    
+    [JsonPropertyName("sub_claims"), AllowNull]
     public SubClaims SubClaims { get; set; }
 }

@@ -1,15 +1,16 @@
-using System.Text.Json;
-using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Rewrite;
 using SecretsMocker.Authorization;
-using SecretsMocker.Models.AKeyless;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers(options => options.AllowEmptyInputInBodyModelBinding = true).AddJsonOptions(options =>
+builder.Services.AddControllers(options =>
+{
+    options.AllowEmptyInputInBodyModelBinding = true;
+}).AddJsonOptions(options =>
 {
     options.AllowInputFormatterExceptionMessages = true;
-    options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+    options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault;
 });
 
 builder.Services.AddEndpointsApiExplorer();

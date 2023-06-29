@@ -22,25 +22,22 @@ namespace SecretsMocker.Controllers
         [HttpPost]
         public AkeylessCreateOutput Create([FromBody] AkeylessCreateInput input)
         {
-            // Demo ID, e.g. 'tmp.cxfzw_6a0WAeFkMVAi8kNwU2XsB0TM7zQ'
+            // Demo ID, e.g. 'tmp.user_6a0WAeFkMVAi8kNwU2XsB0TM7zQ'
             var generatedId = MockHelpers.GenerateId();
+            
+            // Changing the response type depending on what the caller wants
+            var payload = input.Payload switch
+            {
+                "cert" => MockHelpers.GenerateCertPayload(),
+                "password" => MockHelpers.GeneratePasswordPayload(),
+                _ => MockHelpers.GeneratePasswordPayload()
+            };
 
             return new AkeylessCreateOutput
             {
                 Id = generatedId,
-                Response = GenerateSamplePayload()
+                Response = payload
             };
-
-            //var json = new JsonObject();
-            //json.Add("id", generatedId);
-            //json.Add("response", GenerateSamplePayload());
-            //return new JsonResult(json);
-
-            //return new JsonResult(new AkeylessCreateOutput
-            //{
-            //    Id = generatedId,
-            //    Response = GenerateSamplePayload()
-            //});
         }
         
         [AllowAnonymous]
@@ -50,18 +47,11 @@ namespace SecretsMocker.Controllers
         {
             // This is just an example, automatically saying all of the credentials were revoked.
             // In a real-world application, you would take the process of revoking the ids and then returning back the results.
-
             return new AkeylessRevokeOutput
             {
                 Revoked = input.Ids,
-                Message = GenerateSamplePayload()
+                Message = MockHelpers.GenerateCertPayload()
             };
-
-            //return new JsonResult(new AkeylessRevokeOutput
-            //{
-            //    Revoked = input.Ids,
-            //    Message = GenerateSamplePayload()
-            //});
         }
 
         [AllowAnonymous]
@@ -69,35 +59,11 @@ namespace SecretsMocker.Controllers
         [HttpPost]
         public AkeylessRotateOutput Rotate([FromBody] AkeylessRotateInput input)
         {
-            // This is just a demo. To mimic rotating a secret;
+            // Mimic rotating a secret;
             return new AkeylessRotateOutput
             {
-                Payload = GenerateSamplePayload()
+                Payload = MockHelpers.GenerateCertPayload()
             };
-
-            //return new JsonResult(new AkeylessRotateOutput
-            //{
-            //    Payload = GenerateSamplePayload()
-            //});
-        }
-
-        private string GenerateSamplePayload()
-        {
-            //var certRes = new CertResponse
-            //{
-            //    UpdatedAt = DateTime.UtcNow,
-            //    Cert = "now-i-know-my-abcs",
-            //    PrivateKey = "abcdefghijklmnopqrstuvwyz"
-            //};
-            //return JsonSerializer.Serialize(certRes);
-            
-            var json = new JsonObject
-            {
-                { "updated_at", DateTime.UtcNow.Ticks },
-                { "cert", "now-i-know-my-abcs" },
-                { "secret_key", "abcdefghijklmnopqrstuvwyz" }
-            };
-            return json.ToJsonString();
         }
     }
 }

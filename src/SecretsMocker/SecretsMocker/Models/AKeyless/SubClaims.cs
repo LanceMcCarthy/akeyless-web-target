@@ -4,7 +4,7 @@ using System.Text.Json.Serialization;
 
 namespace SecretsMocker.Models.AKeyless;
 
-//[JsonConverter(typeof(SubClaimsConverter))]
+//[JsonConverter(typeof(SubClaimsConverter))] // in case manual parsing is needed
 public class SubClaims
 {
     [JsonPropertyName("claim1"), AllowNull]

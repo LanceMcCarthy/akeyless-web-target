@@ -4,7 +4,7 @@ using System.Text.Json.Serialization;
 
 namespace SecretsMocker.Models.AKeyless;
 
-//[JsonConverter(typeof(ClientInfoConverter))]
+//[JsonConverter(typeof(ClientInfoConverter))] // in case manual parsing is needed
 public class ClientInfo
 {
     [JsonPropertyName("access_id"), AllowNull]

@@ -11,7 +11,7 @@ public class AkeylessCreateInput
     public string Payload { get; set; }
     
     [JsonPropertyName("input"), AllowNull]
-    public Input Input { get; set; }
+    public string Input { get; set; }
     
     [JsonPropertyName("client_info"), AllowNull]
     public ClientInfo ClientInfo { get; set; }

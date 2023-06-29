@@ -2,6 +2,7 @@
 using SecretsMocker.Authorization;
 using SecretsMocker.Helpers;
 using SecretsMocker.Models.AKeyless;
+using System.Text.Json;
 
 namespace SecretsMocker.Controllers
 {
@@ -60,10 +61,14 @@ namespace SecretsMocker.Controllers
 
         private string GenerateSamplePayload()
         {
-            var payload = "{";
-            payload += $"\"updated\": \"{DateTime.UtcNow.Ticks}\", \"cert\": \"abcdefghijklmnopqrstuvwyz\", \"private_key\": \"now-i-know-my-abcs\"";
-            payload += "}";
-            return payload;
+            var certRes = new CertResponse
+            {
+                UpdatedAt = DateTime.UtcNow,
+                Cert = "now-i-know-my-abcs",
+                PrivateKey = "abcdefghijklmnopqrstuvwyz"
+            };
+
+            return JsonSerializer.Serialize(certRes);
         }
     }
 }

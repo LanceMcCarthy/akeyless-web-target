@@ -5,9 +5,6 @@ namespace SecretsMocker.Models.AKeyless;
 
 public class CertResponse
 {
-    [JsonPropertyName("updated_at"), AllowNull]
-    public DateTime UpdatedAt { get; set; }
-
     [JsonPropertyName("cert"), AllowNull]
     public string Cert { get; set; }
 

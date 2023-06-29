@@ -1,6 +1,4 @@
 using System.Diagnostics.CodeAnalysis;
-using System.Globalization;
-using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace SecretsMocker.Models.AKeyless;
@@ -34,8 +32,3 @@ public class AkeylessCreateInput
 //Information about the user requesting the credentials. It includes the user's Akeyless access ID, as well as any sub-claims.
 //Examples:
 // { "access_id": "p-1234", "sub_claims": { "claim1": ["value1"] } }
-
-// IMPORTANT
-// When first adding a custom producer to the Akeyless gateway, it will do a dry run test.
-// You will need to be able to handle this request, the empty 'input' will cause an exception with the json deserializer, so we use a custom converter to handle null
-// {"payload":"","input":"","client_info":{"access_id":"p-custom","sub_claims":null}}

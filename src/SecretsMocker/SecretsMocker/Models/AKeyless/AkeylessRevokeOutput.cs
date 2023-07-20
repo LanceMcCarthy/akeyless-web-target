@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 
 namespace SecretsMocker.Models.AKeyless;
@@ -9,7 +10,7 @@ public class AkeylessRevokeOutput
     public List<string> Revoked { get; set; }
     
     [JsonPropertyName("message"), AllowNull]
-    public string Message { get; set; }
+    public JsonObject Message { get; set; }
 }
 
 //revoked

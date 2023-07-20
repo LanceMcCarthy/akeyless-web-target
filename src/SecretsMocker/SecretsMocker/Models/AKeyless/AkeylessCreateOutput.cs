@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 
 namespace SecretsMocker.Models.AKeyless;
@@ -9,7 +10,7 @@ public class AkeylessCreateOutput
     public string Id { get; set; }
     
     [JsonPropertyName("response"), AllowNull]
-    public string Response { get; set; }
+    public JsonObject Response { get; set; }
 }
 
 //id

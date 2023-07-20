@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 
 namespace SecretsMocker.Models.AKeyless;
@@ -6,7 +7,7 @@ namespace SecretsMocker.Models.AKeyless;
 public class AkeylessRotateOutput
 {
     [JsonPropertyName("payload"), AllowNull]
-    public string Payload { get; set; }
+    public JsonObject Payload { get; set; }
 }
 
 //payload

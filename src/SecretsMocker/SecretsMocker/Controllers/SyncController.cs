@@ -2,68 +2,66 @@
 using SecretsMocker.Authorization;
 using SecretsMocker.Helpers;
 using SecretsMocker.Models.AKeyless;
-using System.Text.Json.Nodes;
 
-namespace SecretsMocker.Controllers
+namespace SecretsMocker.Controllers;
+
+[Authorize]
+[Route("api/sync")]
+[ApiController]
+public class SyncController : ControllerBase
 {
-    [Authorize]
-    [Route("api/sync")]
-    [ApiController]
-    public class SyncController : ControllerBase
+    [HttpGet]
+    public string Get()
     {
-        [HttpGet]
-        public string Get()
-        {
-            return "Service is running! For normal operation, use AKeyless custom Dynamic Secrets provider.";
-        }
+        return "Service is running! For normal operation, use AKeyless custom Dynamic Secrets provider.";
+    }
 
-        [AllowAnonymous]
-        [Route("create")]
-        [HttpPost]
-        public AkeylessCreateOutput Create([FromBody] AkeylessCreateInput input)
-        {
-            // Demo ID, e.g. 'tmp.user_6a0WAeFkMVAi8kNwU2XsB0TM7zQ'
-            var generatedId = MockHelpers.GenerateId();
-            
-            // Changing the response type depending on what the caller wants
-            var payload = input.Payload switch
-            {
-                "cert" => MockHelpers.GenerateCertPayload(),
-                "password" => MockHelpers.GeneratePasswordPayload(),
-                _ => MockHelpers.GeneratePasswordPayload()
-            };
+    [AllowAnonymous]
+    [Route("create")]
+    [HttpPost]
+    public AkeylessCreateOutput Create([FromBody] AkeylessCreateInput input)
+    {
+        // Demo ID, e.g. 'tmp.user_6a0WAeFkMVAi8kNwU2XsB0TM7zQ'
+        var generatedId = MockHelpers.GenerateId();
 
-            return new AkeylessCreateOutput
-            {
-                Id = generatedId,
-                Response = payload
-            };
-        }
-        
-        [AllowAnonymous]
-        [Route("revoke")]
-        [HttpPost]
-        public AkeylessRevokeOutput Revoke([FromBody] AkeylessRevokeInput input)
+        // Changing the response type depending on what the caller wants
+        var payload = input.Payload switch
         {
-            // This is just an example, automatically saying all of the credentials were revoked.
-            // In a real-world application, you would take the process of revoking the ids and then returning back the results.
-            return new AkeylessRevokeOutput
-            {
-                Revoked = input.Ids,
-                Message = MockHelpers.GenerateCertPayload()
-            };
-        }
+            "cert" => MockHelpers.GenerateCertPayload(),
+            "password" => MockHelpers.GeneratePasswordPayload(),
+            _ => MockHelpers.GeneratePasswordPayload()
+        };
 
-        [AllowAnonymous]
-        [Route("rotate")]
-        [HttpPost]
-        public AkeylessRotateOutput Rotate([FromBody] AkeylessRotateInput input)
+        return new AkeylessCreateOutput
         {
-            // Mimic rotating a secret;
-            return new AkeylessRotateOutput
-            {
-                Payload = MockHelpers.GenerateCertPayload()
-            };
-        }
+            Id = generatedId,
+            Response = payload
+        };
+    }
+
+    [AllowAnonymous]
+    [Route("revoke")]
+    [HttpPost]
+    public AkeylessRevokeOutput Revoke([FromBody] AkeylessRevokeInput input)
+    {
+        // This is just an example, automatically saying all of the credentials were revoked.
+        // In a real-world application, you would take the process of revoking the ids and then returning back the results.
+        return new AkeylessRevokeOutput
+        {
+            Revoked = input.Ids,
+            Message = MockHelpers.GenerateCertPayload()
+        };
+    }
+
+    [AllowAnonymous]
+    [Route("rotate")]
+    [HttpPost]
+    public AkeylessRotateOutput Rotate([FromBody] AkeylessRotateInput input)
+    {
+        // Mimic rotating a secret;
+        return new AkeylessRotateOutput
+        {
+            Payload = MockHelpers.GenerateCertPayload()
+        };
     }
 }

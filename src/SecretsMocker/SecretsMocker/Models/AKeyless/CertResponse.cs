@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 
 namespace SecretsMocker.Models.AKeyless;
@@ -9,5 +10,5 @@ public class CertResponse
     public string Cert { get; set; }
 
     [JsonPropertyName("private_key"), AllowNull]
-    public string PrivateKey { get; set; }
+    public JsonObject PrivateKey { get; set; }
 }

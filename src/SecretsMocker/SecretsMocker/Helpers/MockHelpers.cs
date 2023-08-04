@@ -36,25 +36,25 @@ public static class MockHelpers
     /// Example:  "{\"cert\":\"CER-contents\",\"secret_key\":\"PFX-as-string\"}"
     /// </summary>
     /// <returns>A serialized json object with cert and secret_key fields</returns>
-    public static JsonObject GenerateCertPayload()
-    {
-        var ecdsa = ECDsa.Create(); // asymmetric key pair
-        var req = new CertificateRequest("cn=foobar", ecdsa, HashAlgorithmName.SHA256);
-        var certificate2 = req.CreateSelfSigned(DateTimeOffset.Now, DateTimeOffset.Now.AddYears(5));
+    //public static JsonObject GenerateCertPayload()
+    //{
+    //    var ecdsa = ECDsa.Create(); // asymmetric key pair
+    //    var req = new CertificateRequest("cn=foobar", ecdsa, HashAlgorithmName.SHA256);
+    //    var certificate2 = req.CreateSelfSigned(DateTimeOffset.Now, DateTimeOffset.Now.AddYears(5));
 
-        // Create PFX (PKCS #12) with private key
-        var keyBytes = certificate2.Export(X509ContentType.Pfx, "P@55w0rd");
-        var privateKey = System.Text.Encoding.Default.GetString(keyBytes);
+    //    // Create PFX (PKCS #12) with private key
+    //    var keyBytes = certificate2.Export(X509ContentType.Pfx, "P@55w0rd");
+    //    var privateKey = System.Text.Encoding.Default.GetString(keyBytes);
 
-        // Create Base 64 encoded CER (public key only)
-        var cert = "-----BEGIN CERTIFICATE-----\r\n"
-            + Convert.ToBase64String(certificate2.Export(X509ContentType.Cert), Base64FormattingOptions.InsertLineBreaks)
-            + "\r\n-----END CERTIFICATE-----";
+    //    // Create Base 64 encoded CER (public key only)
+    //    var cert = "-----BEGIN CERTIFICATE-----\r\n"
+    //        + Convert.ToBase64String(certificate2.Export(X509ContentType.Cert), Base64FormattingOptions.InsertLineBreaks)
+    //        + "\r\n-----END CERTIFICATE-----";
 
-        return new JsonObject
-            {
-                { "cert", cert },
-                { "secret_key", privateKey }
-            };
-    }
+    //    return new JsonObject
+    //        {
+    //            { "cert", cert },
+    //            { "secret_key", privateKey }
+    //        };
+    //}
 }

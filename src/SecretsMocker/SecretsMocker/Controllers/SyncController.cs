@@ -44,7 +44,7 @@ public class SyncController : ControllerBase
         return new AkeylessRevokeOutput
         {
             Revoked = input.Ids,
-            Message = $"{input.Ids} were removed"
+            Message = $"{string.Join(",", input.Ids)} were revoked"
         };
     }
 

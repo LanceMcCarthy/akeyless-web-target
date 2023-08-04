@@ -25,12 +25,7 @@ public class SyncController : ControllerBase
         var generatedId = MockHelpers.GenerateId();
 
         // Changing the response type depending on what the caller wants
-        var payload = input.Payload switch
-        {
-            "cert" => MockHelpers.GenerateCertPayload(),
-            "password" => MockHelpers.GeneratePasswordPayload(),
-            _ => MockHelpers.GeneratePasswordPayload()
-        };
+        var payload = MockHelpers.GeneratePasswordPayload();
 
         return new AkeylessCreateOutput
         {
@@ -49,7 +44,7 @@ public class SyncController : ControllerBase
         return new AkeylessRevokeOutput
         {
             Revoked = input.Ids,
-            Message = MockHelpers.GenerateCertPayload()
+            Message = $"{input.Ids} were removed"
         };
     }
 
@@ -61,7 +56,7 @@ public class SyncController : ControllerBase
         // Mimic rotating a secret;
         return new AkeylessRotateOutput
         {
-            Payload = MockHelpers.GenerateCertPayload()
+            Payload = MockHelpers.GeneratePasswordPayload()
         };
     }
 }

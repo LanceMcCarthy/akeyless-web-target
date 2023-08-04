@@ -10,7 +10,7 @@ public class AkeylessRevokeOutput
     public List<string> Revoked { get; set; }
     
     [JsonPropertyName("message"), AllowNull]
-    public JsonObject Message { get; set; }
+    public string Message { get; set; }
 }
 
 //revoked

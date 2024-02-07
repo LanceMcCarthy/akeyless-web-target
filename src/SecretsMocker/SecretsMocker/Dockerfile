@@ -12,7 +12,7 @@ RUN dotnet restore "./SecretsMocker.csproj" --configfile "./nuget.config" -r lin
 RUN dotnet build "./SecretsMocker.csproj" -c Release -r linux-arm64 -o /app/build --no-restore
 
 FROM build AS publish
-RUN dotnet publish "./SecretsMocker.csproj" --no-restore -c Release -r linux-arm64 -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "./SecretsMocker.csproj" --no-restore -c Release -r linux-arm64 -o /app/publish /p:UseAppHost=false --self-contained false
 
 FROM base AS final
 WORKDIR /app

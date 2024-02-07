@@ -1,18 +1,19 @@
+name: SingleArch Build
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - main
-    paths:
-      - 'src/SecretsMocker/**/*'
-      - '.github/workflows/docker-publish.yml'
+  # push:
+  #   branches:
+  #     - main
+  #   paths:
+  #     - 'src/SecretsMocker/**/*'
+  #     - '.github/workflows/docker-publish.yml'
 
 jobs:
   build_api:
     runs-on: ubuntu-22.04
     steps:
     - name: Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         fetch-depth: 0
 
@@ -25,21 +26,24 @@ jobs:
         
     - name: Verify tag output
       run: echo ${{ steps.tag-creator.outputs.DOCKER_HUB_TAG }}
-      
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
     - name: Get Docker metadata from Docker Hub
       id: meta
-      uses: docker/metadata-action@v4
+      uses: docker/metadata-action@v5
       with:
         images: lancemccarthy/secretsmocker
 
     - name: Login to DockerHub
-      uses: docker/login-action@v2
+      uses: docker/login-action@v3
       with:
         username: ${{ secrets.DOCKER_HUB_USERNAME }}
         password: ${{ secrets.DOCKER_HUB_PAT }}
 
     - name: Build and push to Docker Hub
-      uses: docker/build-push-action@v3
+      uses: docker/build-push-action@v5
       with:
         context: src/SecretsMocker/SecretsMocker
         platforms: linux/amd64,linux/arm64

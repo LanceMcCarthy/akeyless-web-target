@@ -48,8 +48,8 @@ jobs:
     - name: Build and push to Docker Hub
       uses: docker/build-push-action@v5
       with:
-        context: src/SecretsMocker/SecretsMocker
-        platforms: linux/arm64
+        context: .
+        platforms: linux/arm64, linux/amd64
         push: true
         secrets: |
           telerik_key=${{ secrets.TELERIK_NUGET_KEY }}

@@ -1,4 +1,4 @@
-name: SingleArch Build
+name: Build and Publish Multi-platform
 on:
   workflow_dispatch:
   # push:
@@ -26,6 +26,9 @@ jobs:
         
     - name: Verify tag output
       run: echo ${{ steps.tag-creator.outputs.DOCKER_HUB_TAG }}
+
+    - name: Set up QEMU
+      uses: docker/setup-qemu-action@v3
 
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3

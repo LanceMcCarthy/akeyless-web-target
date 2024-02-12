@@ -8,11 +8,11 @@ WORKDIR '/src/SecretsMocker/SecretsMocker'
 COPY . .
 RUN --mount=type=secret,id=telerik_key \
   dotnet nuget update source 'Telerik_Feed' -s 'https://nuget.telerik.com/v3/index.json' -u 'api-key' -p $(cat /run/secrets/telerik_key) --configfile './nuget.config' --store-password-in-clear-text
-RUN dotnet restore './SecretsMocker.csproj' --configfile './nuget.config'
-RUN dotnet build './SecretsMocker.csproj' -c Release -o /app/build --no-restore
+RUN dotnet restore './SecretsMocker.csproj' --configfile './nuget.config' -a $TARGETARCH
+RUN dotnet build './SecretsMocker.csproj' -c Release -o /app/build --no-restore -a $TARGETARCH
 
 FROM build AS publish
-RUN dotnet publish './SecretsMocker.csproj' --no-restore -c Release -o /app/publish /p:UseAppHost=false --self-contained false
+RUN dotnet publish './SecretsMocker.csproj' --no-restore -c Release -o /app/publish /p:UseAppHost=false --self-contained false -a $TARGETARCH
 
 FROM base AS final
 WORKDIR /app

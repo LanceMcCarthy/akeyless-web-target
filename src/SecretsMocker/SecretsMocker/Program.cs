@@ -6,11 +6,8 @@ using System.Text.Encodings.Web;
 using System.Text.Json.Serialization;
 using SecretsMocker.Helpers;
 using Serilog;
-using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
-
-//var dir = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
 
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Warning()
@@ -92,9 +89,10 @@ app.MapGet("/", async (HttpContext context, HttpResponse response) =>
 
         Log.Warning($" ==> {host} at {ip} <==");
     }
-    catch
+    catch (Exception e)
     {
         Log.Error($"Could not read IP addresses or forwarded headers.");
+        Log.Error(e.ToString());
     }
 
     await response.WriteAsync(@"<p>This app does not have a frontend, please go to the <a href=""swagger/index.html""> swagger page</a> instead.</p>");

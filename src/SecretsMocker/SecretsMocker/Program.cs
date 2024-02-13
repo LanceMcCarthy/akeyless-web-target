@@ -6,8 +6,11 @@ using System.Text.Encodings.Web;
 using System.Text.Json.Serialization;
 using SecretsMocker.Helpers;
 using Serilog;
+using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
+
+//var dir = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
 
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Warning()
@@ -19,7 +22,6 @@ builder.Services.Configure<ForwardedHeadersOptions>(options =>
 {
     options.KnownProxies.Add(IPAddress.Parse("10.0.0.6"));
     options.KnownProxies.Add(IPAddress.Parse("10.0.0.7"));
-    options.KnownProxies.Add(IPAddress.Parse("127.0.0.1"));
     options.KnownProxies.Add(IPAddress.Parse("172.17.0.1"));
     options.KnownProxies.Add(IPAddress.Parse("172.21.0.1"));
     options.KnownProxies.Add(IPAddress.Parse("172.22.0.1"));
@@ -46,10 +48,7 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-app.UseForwardedHeaders(new ForwardedHeadersOptions
-{
-    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
-});
+app.UseForwardedHeaders(new ForwardedHeadersOptions { ForwardedHeaders = ForwardedHeaders.All });
 
 app.UseCors(x => x
     .AllowAnyOrigin()
@@ -74,9 +73,24 @@ app.MapGet("/", async (HttpContext context, HttpResponse response) =>
 {
     try
     {
-        var ips = context.GetRequestIp();
+        var ip = "";
+        var host = "Client";
 
-        Log.Warning($"[ACCESSED BY IP] {ips}");
+        if (context.Request.Headers.ContainsKey("X-Forwarded-For"))
+        {
+            ip = context.GetHeaderValueAs<string>("X-Forwarded-For").SplitCsv().FirstOrDefault();
+
+            if (context.Request.Headers.ContainsKey("X-Forwarded-Host"))
+            {
+                host = context.GetHeaderValueAs<string>("X-Forwarded-For").SplitCsv().FirstOrDefault();
+            }
+        }
+        else
+        {
+            ip = context.Connection.RemoteIpAddress?.ToString();
+        }
+
+        Log.Warning($" ==> {host} at {ip} <==");
     }
     catch
     {

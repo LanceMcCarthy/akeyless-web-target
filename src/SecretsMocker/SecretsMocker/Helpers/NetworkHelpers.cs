@@ -2,28 +2,29 @@
 
 public static class NetworkHelpers
 {
-    public static string GetRequestIp(this HttpContext context, bool tryUseXForwardHeader = true)
-    {
-        string ip = null;
+    //public static string GetRequestIp(this HttpContext context, bool tryUseXForwardHeader = true)
+    //{
+    //    string ip = null;
 
-        if (tryUseXForwardHeader)
-            ip = context.GetHeaderValueAs<string>("X-Forwarded-For").SplitCsv().FirstOrDefault();
+    //    if (tryUseXForwardHeader)
+    //        ip = context.GetHeaderValueAs<string>("X-Forwarded-For").SplitCsv().FirstOrDefault();
+    //        //ip = context.GetHeaderValueAs<string>("X-Forwarded-For");
 
-        if (ip.IsNullOrWhitespace() && context?.Connection?.RemoteIpAddress != null)
-            ip = context.Connection.RemoteIpAddress.ToString();
+    //    if (ip.IsNullOrWhitespace() && context?.Connection.RemoteIpAddress != null)
+    //        ip = context.Connection.RemoteIpAddress.ToString();
 
-        if (ip.IsNullOrWhitespace())
-            ip = context.GetHeaderValueAs<string>("REMOTE_ADDR");
+    //    if (ip.IsNullOrWhitespace())
+    //        ip = context.GetHeaderValueAs<string>("REMOTE_ADDR");
 
-        if (ip.IsNullOrWhitespace())
-            throw new Exception("Unable to determine caller's IP.");
+    //    if (ip.IsNullOrWhitespace())
+    //        ip = "Unable to determine caller's IP.";
 
-        return ip;
-    }
+    //    return ip;
+    //}
 
     public static T GetHeaderValueAs<T>(this HttpContext context, string headerName)
     {
-        if (context?.Request?.Headers?.TryGetValue(headerName, out var values) ?? false)
+        if (context?.Request.Headers.TryGetValue(headerName, out var values) ?? false)
         {
             var rawValues = values.ToString();
 

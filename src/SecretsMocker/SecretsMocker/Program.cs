@@ -54,7 +54,7 @@ app.UseCors(x => x
 
 app.UseSwagger();
 app.UseSwaggerUI();
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 app.UseAuthorization();
 
 // Custom middleware for handling AKeyless request headers.

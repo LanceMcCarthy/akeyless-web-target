@@ -29,9 +29,13 @@ jobs:
 
     - name: Set up QEMU
       uses: docker/setup-qemu-action@v3
+      with:
+        platforms: linux/arm64
 
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
+      with:
+        platforms: linux/arm64
 
     - name: Get Docker metadata from Docker Hub
       id: meta
@@ -49,7 +53,7 @@ jobs:
       uses: docker/build-push-action@v5
       with:
         context: src/SecretsMocker/SecretsMocker
-        platforms: linux/arm64,linux/amd64
+        platforms: linux/arm64
         push: true
         secrets: |
           telerik_key=${{ secrets.TELERIK_NUGET_KEY }}

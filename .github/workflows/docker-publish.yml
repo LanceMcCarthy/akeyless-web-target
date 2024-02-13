@@ -1,4 +1,4 @@
-name: Build and Publish Multi-platform
+name: Build and Publish
 on:
   workflow_dispatch:
   # push:
@@ -26,17 +26,7 @@ jobs:
         
     - name: Verify tag output
       run: echo ${{ steps.tag-creator.outputs.DOCKER_HUB_TAG }}
-
-    - name: Set up QEMU
-      uses: docker/setup-qemu-action@v3
-      with:
-        platforms: linux/arm64,linux/amd64
-
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v3
-      with:
-        platforms: linux/arm64,linux/amd64
-
+      
     - name: Get Docker metadata from Docker Hub
       id: meta
       uses: docker/metadata-action@v5
@@ -53,7 +43,6 @@ jobs:
       uses: docker/build-push-action@v5
       with:
         context: src/SecretsMocker/SecretsMocker
-        platforms: linux/arm64,linux/amd64
         push: true
         secrets: |
           telerik_key=${{ secrets.TELERIK_NUGET_KEY }}

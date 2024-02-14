@@ -49,4 +49,4 @@ jobs:
         docker manifest create "${{env.CONTAINER_REG}}/lancemccarthy/secretsmocker:${{env.CONTAINER_TAG}}" \
           ${{ steps.build-x64.outputs.generated_container_name }} \
           ${{ steps.build-arm64.outputs.generated_container_name }}
-        docker manifest push "lancemccarthy/secretsmocker:${{env.CONTAINER_TAG}}"
+        docker manifest push "${{env.CONTAINER_REG}}/lancemccarthy/secretsmocker:${{env.CONTAINER_TAG}}"

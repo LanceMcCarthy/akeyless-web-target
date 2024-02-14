@@ -6,6 +6,7 @@ COPY . .
 RUN dotnet publish './SecretsMocker.csproj' -o /app/publish /p:UseAppHost=false --self-contained false --arch "${TARGETARCH}"
 
 FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/aspnet:8.0 as final
+ARG BUILDPLATFORM
 WORKDIR /app
 COPY --from=build /app/publish .
 ENTRYPOINT ["dotnet", "SecretsMocker.dll"]

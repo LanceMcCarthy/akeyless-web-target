@@ -6,13 +6,12 @@ env:
   CONTAINER_BASE_IMAGE: "mcr.microsoft.com/dotnet/aspnet:8.0"
   CONTAINER_REG: "registry.hub.docker.com"
   CONTAINER_REPO: "lancemccarthy/secretsmocker"
-  CONTAINER_TAG: "latest"
   
 jobs:
   build_x64:
     runs-on: ubuntu-22.04
     outputs:
-      container_name: ${{ steps.build.outputs.container_build }}
+      build_tag: ${{ steps.build.outputs.build_tag }}
     env:
       target_arch: "x64"
     steps:
@@ -36,12 +35,12 @@ jobs:
       working-directory: src/SecretsMocker/SecretsMocker
       run: |
         dotnet publish -t:PublishContainer -p PublishProfile=DefaultContainer --arch x64 -p ContainerImageTag="${{steps.tag-creator.outputs.VERSION_TAG}}-${{env.target_arch}}" -p ContainerRepository=${{env.CONTAINER_REPO}} -p ContainerRegistry=${{env.CONTAINER_REG}} -p ContainerBaseImage=${{env.CONTAINER_BASE_IMAGE}}
-        echo "container_build=${{env.CONTAINER_REG}}/${{env.CONTAINER_REPO}}:${{steps.tag-creator.outputs.VERSION_TAG}}-${{env.target_arch}}" >> $GITHUB_OUTPUT
+        echo "build_tag=${{steps.tag-creator.outputs.VERSION_TAG}}-${{env.target_arch}}" >> $GITHUB_OUTPUT
 
   build_arm64:
     runs-on: ubuntu-22.04
     outputs:
-      container_name: ${{ steps.build.outputs.container_build }}
+      build_tag: ${{ steps.build.outputs.build_tag }}
     env:
       target_arch: "arm64"
     steps:
@@ -65,12 +64,12 @@ jobs:
       working-directory: src/SecretsMocker/SecretsMocker
       run: |
         dotnet publish -t:PublishContainer -p PublishProfile=DefaultContainer --arch arm64 -p ContainerImageTag="v${{steps.tag-creator.outputs.VERSION_TAG}}-${{env.target_arch}}" -p ContainerRepository=${{env.CONTAINER_REPO}} -p ContainerRegistry=${{env.CONTAINER_REG}} -p ContainerBaseImage=${{ env.CONTAINER_BASE_IMAGE }}
-        echo "container_build=${{env.CONTAINER_REG}}/${{env.CONTAINER_REPO}}:${{steps.tag-creator.outputs.VERSION_TAG}}-${{env.target_arch}}" >> $GITHUB_OUTPUT
+        echo "build_tag=${{steps.tag-creator.outputs.VERSION_TAG}}-${{env.target_arch}}" >> $GITHUB_OUTPUT
 
   build_arm:
     runs-on: ubuntu-22.04
     outputs:
-      container_name: ${{ steps.build.outputs.container_build }}
+      build_tag: ${{ steps.build.outputs.build_tag }}
     env:
       target_arch: "arm"
     steps:
@@ -94,7 +93,7 @@ jobs:
       working-directory: src/SecretsMocker/SecretsMocker
       run: |
         dotnet publish -t:PublishContainer -p PublishProfile=DefaultContainer --arch arm -p ContainerImageTag="${{steps.tag-creator.outputs.VERSION_TAG}}-${{env.target_arch}}" -p ContainerRepository=${{env.CONTAINER_REPO}} -p ContainerRegistry=${{env.CONTAINER_REG}} -p ContainerBaseImage=${{ env.CONTAINER_BASE_IMAGE }}
-        echo "container_build=${{env.CONTAINER_REG}}/${{env.CONTAINER_REPO}}:${{steps.tag-creator.outputs.VERSION_TAG}}-${{env.target_arch}}" >> $GITHUB_OUTPUT
+        echo "build_tag=${{steps.tag-creator.outputs.VERSION_TAG}}-${{env.target_arch}}" >> $GITHUB_OUTPUT
 
   publish_combined_manifest:
     runs-on: ubuntu-22.04
@@ -111,13 +110,13 @@ jobs:
     - name: create the multi-image manifest
       run: |
         docker manifest create "${{env.CONTAINER_REG}}/${{env.CONTAINER_REPO}}:latest" \
-          $X86_CONTAINER_NAME \
-          $ARM64_CONTAINER_NAME \
-          $ARM_CONTAINER_NAME
+          ${{env.CONTAINER_REG}}/${{env.CONTAINER_REPO}}:$X86_TAG \
+          ${{env.CONTAINER_REG}}/${{env.CONTAINER_REPO}}:$ARM64_TAG \
+          ${{env.CONTAINER_REG}}/${{env.CONTAINER_REPO}}:$ARM_TAG
         
         docker manifest push "${{env.CONTAINER_REG}}/${{env.CONTAINER_REPO}}:latest"
       env:
-        X86_CONTAINER_NAME: ${{ needs.build_x64.outputs.container_name }}
-        ARM64_CONTAINER_NAME: ${{ needs.build_arm64.outputs.container_name }}
-        ARM_CONTAINER_NAME: ${{ needs.build_arm.outputs.container_name }}
+        X86_TAG: ${{needs.build_x64.outputs.build_tag}}
+        ARM64_TAG: ${{needs.build_arm64.outputs.build_tag}}
+        ARM_TAG: ${{needs.build_arm.outputs.build_tag}}
         

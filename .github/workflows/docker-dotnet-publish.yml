@@ -111,8 +111,13 @@ jobs:
     - name: create the multi-image manifest
       run: |
         docker manifest create "${{env.CONTAINER_REG}}/${{env.CONTAINER_REPO}}:latest" \
-          ${{ jobs.build_x64.outputs.container_name }} \
-          ${{ jobs.build_arm64.outputs.container_name }} \
-          ${{ jobs.build_arm.outputs.container_name }}
+          $X86_CONTAINER_NAME \
+          $ARM64_CONTAINER_NAME \
+          $ARM_CONTAINER_NAME
         
         docker manifest push "${{env.CONTAINER_REG}}/${{env.CONTAINER_REPO}}:latest"
+      env:
+        X86_CONTAINER_NAME: ${{ needs.build_x64.outputs.container_name }}
+        ARM64_CONTAINER_NAME: ${{ needs.build_arm64.outputs.container_name }}
+        ARM_CONTAINER_NAME: ${{ needs.build_arm.outputs.container_name }}
+        

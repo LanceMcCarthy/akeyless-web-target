@@ -112,7 +112,7 @@ jobs:
       run: |
         docker manifest create "${{env.CONTAINER_REG}}/${{env.CONTAINER_REPO}}:latest" \
           ${{ jobs.build_x64.outputs.container_name }} \
-          ${{ steps.build_arm64.outputs.container_name }} \
-          ${{ steps.build_arm.outputs.container_name }}
+          ${{ jobs.build_arm64.outputs.container_name }} \
+          ${{ jobs.build_arm.outputs.container_name }}
         
         docker manifest push "${{env.CONTAINER_REG}}/${{env.CONTAINER_REPO}}:latest"

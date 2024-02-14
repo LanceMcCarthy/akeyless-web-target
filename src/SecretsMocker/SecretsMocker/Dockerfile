@@ -12,7 +12,7 @@ ARG TARGETARCH
 ARG BUILDPLATFORM
 RUN echo "TARGETARCH     => $TARGETARCH"
 RUN echo "BUILDPLATFORM  => $BUILDPLATFORM"
-RUN dotnet publish './SecretsMocker.csproj' --no-restore -c Release -o /app/publish /p:UseAppHost=false --self-contained false -a $TARGETARCH
+RUN dotnet publish './SecretsMocker.csproj' --no-restore -c Release -o /app/publish /p:UseAppHost=false --self-contained false -a "${TARGETARCH}"
  
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 as final
 WORKDIR /app

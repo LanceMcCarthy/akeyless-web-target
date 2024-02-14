@@ -63,7 +63,7 @@ jobs:
       id: build
       working-directory: src/SecretsMocker/SecretsMocker
       run: |
-        dotnet publish -t:PublishContainer -p PublishProfile=DefaultContainer --arch arm64 -p ContainerImageTag="v${{steps.tag-creator.outputs.VERSION_TAG}}-${{env.target_arch}}" -p ContainerRepository=${{env.CONTAINER_REPO}} -p ContainerRegistry=${{env.CONTAINER_REG}} -p ContainerBaseImage=${{ env.CONTAINER_BASE_IMAGE }}
+        dotnet publish -t:PublishContainer -p PublishProfile=DefaultContainer --arch arm64 -p ContainerImageTag="${{steps.tag-creator.outputs.VERSION_TAG}}-${{env.target_arch}}" -p ContainerRepository=${{env.CONTAINER_REPO}} -p ContainerRegistry=${{env.CONTAINER_REG}} -p ContainerBaseImage=${{ env.CONTAINER_BASE_IMAGE }}
         echo "build_tag=${{steps.tag-creator.outputs.VERSION_TAG}}-${{env.target_arch}}" >> $GITHUB_OUTPUT
 
   build_arm:

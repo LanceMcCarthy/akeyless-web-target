@@ -9,8 +9,12 @@ env:
   CONTAINER_TAG: "latest"
   
 jobs:
-  build_api:
+  build_x64:
     runs-on: ubuntu-22.04
+    outputs:
+      container_name: ${{ steps.build.outputs.container_build }}
+    env:
+      target_arch: "x64"
     steps:
     - name: Checkout
       uses: actions/checkout@v4
@@ -24,38 +28,91 @@ jobs:
         tags="$buildDay.$GITHUB_RUN_NUMBER"
         echo "VERSION_TAG=$tags" >> $GITHUB_OUTPUT
 
-    - name: Verify tag output
-      run: echo ${{ steps.tag-creator.outputs.VERSION_TAG }}
-
     - name: Login to Docker Hub
       run: docker login ${{ env.CONTAINER_REG }} -u ${{ secrets.DOCKER_HUB_USERNAME }} -p ${{ secrets.DOCKER_HUB_PAT }}
 
     - name: build the x64 image
-      id: build-x64
+      id: build
       working-directory: src/SecretsMocker/SecretsMocker
       run: |
-        dotnet publish -t:PublishContainer -p PublishProfile=DefaultContainer --arch x64 -p ContainerImageTag="${{steps.tag-creator.outputs.VERSION_TAG}}-x64" -p ContainerRepository=${{env.CONTAINER_REPO}} -p ContainerRegistry=${{env.CONTAINER_REG}} -p ContainerBaseImage=${{ env.CONTAINER_BASE_IMAGE }}
-        echo "FULL_ID=${{env.CONTAINER_REG}}/${{env.CONTAINER_REPO}}:${{env.CONTAINER_TAG}}-x64" >> $GITHUB_OUTPUT
+        dotnet publish -t:PublishContainer -p PublishProfile=DefaultContainer --arch x64 -p ContainerImageTag="${{steps.tag-creator.outputs.VERSION_TAG}}-${{env.target_arch}}" -p ContainerRepository=${{env.CONTAINER_REPO}} -p ContainerRegistry=${{env.CONTAINER_REG}} -p ContainerBaseImage=${{env.CONTAINER_BASE_IMAGE}}
+        echo "container_build=${{env.CONTAINER_REG}}/${{env.CONTAINER_REPO}}:${{steps.tag-creator.outputs.VERSION_TAG}}-${{env.target_arch}}" >> $GITHUB_OUTPUT
+
+  build_arm64:
+    runs-on: ubuntu-22.04
+    outputs:
+      container_name: ${{ steps.build.outputs.container_build }}
+    env:
+      target_arch: "arm64"
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Generate tag version
+      id: tag-creator
+      run: |
+        buildDay=`date +%Y.%m.%d`
+        tags="$buildDay.$GITHUB_RUN_NUMBER"
+        echo "VERSION_TAG=$tags" >> $GITHUB_OUTPUT
+
+    - name: Login to Docker Hub
+      run: docker login ${{ env.CONTAINER_REG }} -u ${{ secrets.DOCKER_HUB_USERNAME }} -p ${{ secrets.DOCKER_HUB_PAT }}
 
     - name: build the arm64 image
-      id: build-arm64
+      id: build
       working-directory: src/SecretsMocker/SecretsMocker
       run: |
-        dotnet publish -t:PublishContainer -p PublishProfile=DefaultContainer --arch arm64 -p ContainerImageTag="${{steps.tag-creator.outputs.VERSION_TAG}}-arm64" -p ContainerRepository=${{env.CONTAINER_REPO}} -p ContainerRegistry=${{env.CONTAINER_REG}} -p ContainerBaseImage=${{ env.CONTAINER_BASE_IMAGE }}
-        echo "FULL_ID=${{env.CONTAINER_REG}}/${{env.CONTAINER_REPO}}:${{env.CONTAINER_TAG}}-arm64" >> $GITHUB_OUTPUT
+        dotnet publish -t:PublishContainer -p PublishProfile=DefaultContainer --arch arm64 -p ContainerImageTag="v${{steps.tag-creator.outputs.VERSION_TAG}}-${{env.target_arch}}" -p ContainerRepository=${{env.CONTAINER_REPO}} -p ContainerRegistry=${{env.CONTAINER_REG}} -p ContainerBaseImage=${{ env.CONTAINER_BASE_IMAGE }}
+        echo "container_build=${{env.CONTAINER_REG}}/${{env.CONTAINER_REPO}}:${{steps.tag-creator.outputs.VERSION_TAG}}-${{env.target_arch}}" >> $GITHUB_OUTPUT
+
+  build_arm:
+    runs-on: ubuntu-22.04
+    outputs:
+      container_name: ${{ steps.build.outputs.container_build }}
+    env:
+      target_arch: "arm"
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Generate tag version
+      id: tag-creator
+      run: |
+        buildDay=`date +%Y.%m.%d`
+        tags="$buildDay.$GITHUB_RUN_NUMBER"
+        echo "VERSION_TAG=$tags" >> $GITHUB_OUTPUT
+
+    - name: Login to Docker Hub
+      run: docker login ${{ env.CONTAINER_REG }} -u ${{ secrets.DOCKER_HUB_USERNAME }} -p ${{ secrets.DOCKER_HUB_PAT }}
 
     - name: build the arm image
-      id: build-arm
+      id: build
       working-directory: src/SecretsMocker/SecretsMocker
       run: |
-        dotnet publish -t:PublishContainer -p PublishProfile=DefaultContainer --arch arm -p ContainerImageTag="${{steps.tag-creator.outputs.VERSION_TAG}}-arm" -p ContainerRepository=${{env.CONTAINER_REPO}} -p ContainerRegistry=${{env.CONTAINER_REG}} -p ContainerBaseImage=${{ env.CONTAINER_BASE_IMAGE }}
-        echo "FULL_ID=${{env.CONTAINER_REG}}/${{env.CONTAINER_REPO}}:${{env.CONTAINER_TAG}}-arm" >> $GITHUB_OUTPUT
+        dotnet publish -t:PublishContainer -p PublishProfile=DefaultContainer --arch arm -p ContainerImageTag="${{steps.tag-creator.outputs.VERSION_TAG}}-${{env.target_arch}}" -p ContainerRepository=${{env.CONTAINER_REPO}} -p ContainerRegistry=${{env.CONTAINER_REG}} -p ContainerBaseImage=${{ env.CONTAINER_BASE_IMAGE }}
+        echo "container_build=${{env.CONTAINER_REG}}/${{env.CONTAINER_REPO}}:${{steps.tag-creator.outputs.VERSION_TAG}}-${{env.target_arch}}" >> $GITHUB_OUTPUT
+
+  publish_combined_manifest:
+    runs-on: ubuntu-22.04
+    needs: [build_x64, build_arm64, build_arm]
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Login to Docker Hub
+      run: docker login ${{ env.CONTAINER_REG }} -u ${{ secrets.DOCKER_HUB_USERNAME }} -p ${{ secrets.DOCKER_HUB_PAT }}
 
     - name: create the multi-image manifest
       run: |
-        docker manifest create "${{env.CONTAINER_REG}}/${{env.CONTAINER_REPO}}:${{env.CONTAINER_TAG}}" \
-          ${{ steps.build-x64.outputs.FULL_ID }} \
-          ${{ steps.build-arm64.outputs.FULL_ID }} \
-          ${{ steps.build-arm.outputs.FULL_ID }}
+        docker manifest create "${{env.CONTAINER_REG}}/${{env.CONTAINER_REPO}}:latest" \
+          ${{ jobs.build_x64.outputs.container_name }} \
+          ${{ steps.build_arm64.outputs.container_name }} \
+          ${{ steps.build_arm.outputs.container_name }}
         
-        docker manifest push "${{env.CONTAINER_REG}}/${{env.CONTAINER_REPO}}:${{env.CONTAINER_TAG}}"
+        docker manifest push "${{env.CONTAINER_REG}}/${{env.CONTAINER_REPO}}:latest"

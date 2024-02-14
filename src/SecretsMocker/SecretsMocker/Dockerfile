@@ -8,4 +8,4 @@ RUN dotnet publish './SecretsMocker.csproj' -o /app/publish /p:UseAppHost=false 
 FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/aspnet:8.0 as final
 WORKDIR /app
 COPY --from=build /app/publish .
-ENTRYPOINT ["./SecretsMocker"]
+ENTRYPOINT ["dotnet", "SecretsMocker.dll"]

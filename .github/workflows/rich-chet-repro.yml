@@ -32,7 +32,7 @@ jobs:
 
     - name: docker build
       id: build-images
-      working-directory: src\SecretsMocker\SecretsMocker
+      working-directory: src/SecretsMocker/SecretsMocker
       run: |
         docker buildx build --platform 'linux/arm64,linux/amd64' -t "secretsmocker:latest" -f Dockerfile .
         docker push "ghcr.io/${{github.repository_owner}}/secretsmocker:latest"

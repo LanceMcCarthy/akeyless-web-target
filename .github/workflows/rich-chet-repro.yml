@@ -34,7 +34,8 @@ jobs:
       id: build-images
       working-directory: src/SecretsMocker/SecretsMocker
       run: |
+        # need to make this username all lowercase, so copying it into a separate var
         OWNER=${{github.repository_owner}}
-        OWNER_LOWERCASE="${OWNER,,}"
-        docker buildx build --push --platform 'linux/arm64,linux/amd64' -t "ghcr.io/$OWNER_LOWERCASE/secretsmocker:latest" -f Dockerfile .
+        # build and push to GH user's ghcr.io reigstry
+        docker buildx build --push --platform 'linux/arm64,linux/amd64' -t "ghcr.io/${OWNER,,}/secretsmocker:latest" -f Dockerfile .
         

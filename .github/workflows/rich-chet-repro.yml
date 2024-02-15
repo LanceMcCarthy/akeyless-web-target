@@ -1,0 +1,39 @@
+name: Rich and Chet Repro
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - 'rick-chet-tester'
+
+jobs:
+  build_api:
+    permissions:
+      contents: read
+      packages: write
+    runs-on: ubuntu-22.04
+    steps:
+    - name: Login to ghcr.io
+      uses: docker/login-action@v3
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Set up QEMU
+      uses: docker/setup-qemu-action@v3
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: docker build
+      id: build-images
+      working-directory: src\SecretsMocker\SecretsMocker
+      run: |
+        docker buildx build --platform 'linux/arm64,linux/amd64' -t "secretsmocker:latest" -f Dockerfile .
+        docker push "ghcr.io/${{github.repository_owner}}/secretsmocker:latest"
+        

@@ -5,10 +5,10 @@ WORKDIR '/src/SecretsMocker/SecretsMocker'
 COPY . .
 RUN dotnet restore -a $TARGETARCH
 RUN dotnet build -a $TARGETARCH
-RUN dotnet publish './SecretsMocker.csproj' -o /app/publish -a $TARGETARCH
+RUN dotnet publish './SecretsMocker.csproj' -o /app/publish -a $TARGETARCH /p:UseAppHost=false
 
 FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/aspnet:8.0 as final
 ARG BUILDPLATFORM
 WORKDIR /app
 COPY --from=build /app/publish .
-ENTRYPOINT ["./SecretsMocker"]
+ENTRYPOINT ["dotnet", "SecretsMocker.dll"]

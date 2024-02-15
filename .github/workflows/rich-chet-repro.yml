@@ -5,6 +5,8 @@ on:
     branches:
       - 'rick-chet-tester'
 
+      env:
+        registry_owner: lancemccarthy
 jobs:
   build_api:
     permissions:
@@ -34,6 +36,8 @@ jobs:
       id: build-images
       working-directory: src/SecretsMocker/SecretsMocker
       run: |
+        OWNER=${{github.repository_owner}}
+        OWNER_LOWERCASE="${OWNER,,}"
         docker buildx build --platform 'linux/arm64,linux/amd64' -t "secretsmocker:latest" -f Dockerfile .
-        docker push "ghcr.io/${{github.repository_owner}}/secretsmocker:latest"
+        docker push "ghcr.io/$OWNER_LOWERCASE/secretsmocker:latest"
         

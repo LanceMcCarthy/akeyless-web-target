@@ -5,8 +5,6 @@ on:
     branches:
       - 'rick-chet-tester'
 
-      env:
-        registry_owner: lancemccarthy
 jobs:
   build_api:
     permissions:

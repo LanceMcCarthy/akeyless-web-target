@@ -36,6 +36,5 @@ jobs:
       run: |
         OWNER=${{github.repository_owner}}
         OWNER_LOWERCASE="${OWNER,,}"
-        docker buildx build --platform 'linux/arm64,linux/amd64' -t "$OWNER_LOWERCASE/secretsmocker:latest" -f Dockerfile .
-        docker push "$OWNER_LOWERCASE/secretsmocker:latest"
+        docker buildx build --push --platform 'linux/arm64,linux/amd64' -t "ghcr.io/$OWNER_LOWERCASE/secretsmocker:latest" -f Dockerfile .
         

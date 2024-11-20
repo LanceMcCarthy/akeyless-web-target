@@ -19,7 +19,7 @@ jobs:
         echo "DOCKER_HUB_TAG=$tags" >> $GITHUB_OUTPUT
         
     - name: Verify tag output
-      run: echo ${{ steps.tag-creator.outputs.DOCKER_HUB_TAG }}
+      run: echo ${{steps.tag-creator.outputs.DOCKER_HUB_TAG}}
       
     - name: Get Docker metadata from Docker Hub
       id: meta
@@ -30,8 +30,8 @@ jobs:
     - name: Login to DockerHub
       uses: docker/login-action@v3
       with:
-        username: ${{ secrets.DOCKER_HUB_USERNAME }}
-        password: ${{ secrets.DOCKER_HUB_PAT }}
+        username: ${{secrets.DOCKER_HUB_USERNAME}}
+        password: ${{secrets.DOCKER_HUB_PAT}}
 
     - name: Set up QEMU
       uses: docker/setup-qemu-action@v3
@@ -50,5 +50,5 @@ jobs:
         context: src/SecretsMocker/SecretsMocker
         push: true
         tags: |
-          ${{ steps.tag-creator.outputs.DOCKER_HUB_TAG }}
+          ${{steps.tag-creator.outputs.DOCKER_HUB_TAG}}
           lancemccarthy/secretsmocker:latest

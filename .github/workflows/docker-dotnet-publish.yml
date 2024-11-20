@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
   
 env:
-  CONTAINER_BASE_IMAGE: "mcr.microsoft.com/dotnet/aspnet:8.0"
+  CONTAINER_BASE_IMAGE: "mcr.microsoft.com/dotnet/aspnet:9.0"
   CONTAINER_REG: "registry.hub.docker.com"
   CONTAINER_REPO: "lancemccarthy/secretsmocker"
   
@@ -11,7 +11,7 @@ jobs:
   build_x64:
     runs-on: ubuntu-22.04
     outputs:
-      build_tag: ${{ steps.build.outputs.build_tag }}
+      build_tag: ${{steps.build.outputs.build_tag}}
     env:
       target_arch: "x64"
     steps:
@@ -28,7 +28,7 @@ jobs:
         echo "VERSION_TAG=$tags" >> $GITHUB_OUTPUT
 
     - name: Login to Docker Hub
-      run: docker login ${{ env.CONTAINER_REG }} -u ${{ secrets.DOCKER_HUB_USERNAME }} -p ${{ secrets.DOCKER_HUB_PAT }}
+      run: docker login ${{env.CONTAINER_REG}} -u ${{secrets.DOCKER_HUB_USERNAME}} -p ${{secrets.DOCKER_HUB_PAT}}
 
     - name: build the x64 image
       id: build
@@ -40,7 +40,7 @@ jobs:
   build_arm64:
     runs-on: ubuntu-22.04
     outputs:
-      build_tag: ${{ steps.build.outputs.build_tag }}
+      build_tag: ${{steps.build.outputs.build_tag}}
     env:
       target_arch: "arm64"
     steps:
@@ -57,19 +57,19 @@ jobs:
         echo "VERSION_TAG=$tags" >> $GITHUB_OUTPUT
 
     - name: Login to Docker Hub
-      run: docker login ${{ env.CONTAINER_REG }} -u ${{ secrets.DOCKER_HUB_USERNAME }} -p ${{ secrets.DOCKER_HUB_PAT }}
+      run: docker login ${{env.CONTAINER_REG}} -u ${{secrets.DOCKER_HUB_USERNAME}} -p ${{secrets.DOCKER_HUB_PAT}}
 
     - name: build the arm64 image
       id: build
       working-directory: src/SecretsMocker/SecretsMocker
       run: |
-        dotnet publish -t:PublishContainer -p PublishProfile=DefaultContainer --arch ${{env.target_arch}} -p ContainerImageTag="${{steps.tag-creator.outputs.VERSION_TAG}}-${{env.target_arch}}" -p ContainerRepository=${{env.CONTAINER_REPO}} -p ContainerRegistry=${{env.CONTAINER_REG}} -p ContainerBaseImage=${{ env.CONTAINER_BASE_IMAGE }}
+        dotnet publish -t:PublishContainer -p PublishProfile=DefaultContainer --arch ${{env.target_arch}} -p ContainerImageTag="${{steps.tag-creator.outputs.VERSION_TAG}}-${{env.target_arch}}" -p ContainerRepository=${{env.CONTAINER_REPO}} -p ContainerRegistry=${{env.CONTAINER_REG}} -p ContainerBaseImage=${{env.CONTAINER_BASE_IMAGE}}
         echo "build_tag=${{steps.tag-creator.outputs.VERSION_TAG}}-${{env.target_arch}}" >> $GITHUB_OUTPUT
 
   build_arm:
     runs-on: ubuntu-22.04
     outputs:
-      build_tag: ${{ steps.build.outputs.build_tag }}
+      build_tag: ${{steps.build.outputs.build_tag}}
     env:
       target_arch: "arm"
     steps:
@@ -86,13 +86,13 @@ jobs:
         echo "VERSION_TAG=$tags" >> $GITHUB_OUTPUT
 
     - name: Login to Docker Hub
-      run: docker login ${{ env.CONTAINER_REG }} -u ${{ secrets.DOCKER_HUB_USERNAME }} -p ${{ secrets.DOCKER_HUB_PAT }}
+      run: docker login ${{env.CONTAINER_REG}} -u ${{secrets.DOCKER_HUB_USERNAME}} -p ${{secrets.DOCKER_HUB_PAT}}
 
     - name: build the arm image
       id: build
       working-directory: src/SecretsMocker/SecretsMocker
       run: |
-        dotnet publish -t:PublishContainer -p PublishProfile=DefaultContainer --arch ${{env.target_arch}} -p ContainerImageTag="${{steps.tag-creator.outputs.VERSION_TAG}}-${{env.target_arch}}" -p ContainerRepository=${{env.CONTAINER_REPO}} -p ContainerRegistry=${{env.CONTAINER_REG}} -p ContainerBaseImage=${{ env.CONTAINER_BASE_IMAGE }}
+        dotnet publish -t:PublishContainer -p PublishProfile=DefaultContainer --arch ${{env.target_arch}} -p ContainerImageTag="${{steps.tag-creator.outputs.VERSION_TAG}}-${{env.target_arch}}" -p ContainerRepository=${{env.CONTAINER_REPO}} -p ContainerRegistry=${{env.CONTAINER_REG}} -p ContainerBaseImage=${{env.CONTAINER_BASE_IMAGE}}
         echo "build_tag=${{steps.tag-creator.outputs.VERSION_TAG}}-${{env.target_arch}}" >> $GITHUB_OUTPUT
 
   publish_combined_manifest:
@@ -105,7 +105,7 @@ jobs:
         fetch-depth: 0
 
     - name: Login to Docker Hub
-      run: docker login ${{ env.CONTAINER_REG }} -u ${{ secrets.DOCKER_HUB_USERNAME }} -p ${{ secrets.DOCKER_HUB_PAT }}
+      run: docker login ${{env.CONTAINER_REG}} -u ${{secrets.DOCKER_HUB_USERNAME}} -p ${{secrets.DOCKER_HUB_PAT}}
 
     - name: create the multi-image manifest
       run: |

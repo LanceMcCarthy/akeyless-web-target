@@ -6,6 +6,7 @@ env:
   CONTAINER_BASE_IMAGE: "mcr.microsoft.com/dotnet/aspnet:9.0"
   CONTAINER_REG: "registry.hub.docker.com"
   CONTAINER_REPO: "lancemccarthy/secretsmocker"
+  DOTNET_VER: "9.0.x"
   
 jobs:
   build_x64:
@@ -19,6 +20,11 @@ jobs:
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
+
+    - name: Setup .NET Core SDK
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: ${{env.DOTNET_VER}}
 
     - name: Generate tag version
       id: tag-creator
@@ -49,6 +55,11 @@ jobs:
       with:
         fetch-depth: 0
 
+    - name: Setup .NET Core SDK
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: ${{env.DOTNET_VER}}
+
     - name: Generate tag version
       id: tag-creator
       run: |
@@ -77,6 +88,11 @@ jobs:
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
+
+    - name: Setup .NET Core SDK
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: ${{env.DOTNET_VER}}
 
     - name: Generate tag version
       id: tag-creator

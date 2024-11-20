@@ -1,11 +1,10 @@
 using Microsoft.AspNetCore.HttpOverrides;
-using Microsoft.AspNetCore.Rewrite;
 using SecretsMocker.Authorization;
+using SecretsMocker.Helpers;
+using Serilog;
 using System.Net;
 using System.Text.Encodings.Web;
 using System.Text.Json.Serialization;
-using SecretsMocker.Helpers;
-using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 

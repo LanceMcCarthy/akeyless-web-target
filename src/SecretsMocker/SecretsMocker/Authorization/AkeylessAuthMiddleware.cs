@@ -3,15 +3,8 @@ using SecretsMocker.Models.AKeyless;
 
 namespace SecretsMocker.Authorization;
 
-public class AkeylessAuthMiddleware
+public class AkeylessAuthMiddleware(RequestDelegate next)
 {
-    private readonly RequestDelegate next;
-
-    public AkeylessAuthMiddleware(RequestDelegate next)
-    {
-        this.next = next;
-    }
-
     public async Task Invoke(HttpContext context)
     {
         try

@@ -1,0 +1,57 @@
+name: 'Terraform with Akeyless Secrets'
+
+on:
+  workflow_dispatch:
+
+permissions:  
+  id-token: write       # required by akeyless
+  contents: read        # required by akeyless and terraform
+  pull-requests: write  # required by terraform
+
+env:
+  TF_CLOUD_ORGANIZATION: "YOUR-ORGANIZATION-HERE"
+  TF_WORKSPACE: "learn-terraform-github-actions"
+  CONFIG_DIRECTORY: "./"
+  # TF_API_TOKEN: "${{ secrets.TF_API_TOKEN }}" <-- do not set this anymore
+
+jobs:
+  terraform:
+    name: "Terraform Plan"
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    # THIS GETS YOUR TEAM TOKEN FROM AKEYLESS and exports it into the TF_API_TOKEN environment variable
+    - name: Fetch static secret from AKeyless
+      id: akeyless
+      uses: LanceMcCarthy/akeyless-action@v4
+      with:
+        access-id: 'p-149l6gayzx05'
+        export-secrets-to-outputs: false
+        export-secrets-to-environment: true
+        static-secrets: '{"/DevTools/terraform-team-token-owners":"TF_API_TOKEN"}'
+
+    - name: Upload Configuration
+      uses: hashicorp/tfc-workflows-github/actions/upload-configuration@v1.0.0
+      id: plan-upload
+      with:
+        workspace: ${{env.TF_WORKSPACE}}
+        directory: ${{env.CONFIG_DIRECTORY}}
+        speculative: true
+
+    - name: Create Plan Run
+      uses: hashicorp/tfc-workflows-github/actions/create-run@v1.0.0
+      id: plan-run
+      with:
+        workspace: ${{ env.TF_WORKSPACE }}
+        configuration_version: ${{ steps.plan-upload.outputs.configuration_version_id }}
+        plan_only: true
+
+    - name: Get Plan Output
+      uses: hashicorp/tfc-workflows-github/actions/plan-output@v1.0.0
+      id: plan-output
+      with:
+        plan: ${{ fromJSON(steps.plan-run.outputs.payload).data.relationships.plan.data.id }}

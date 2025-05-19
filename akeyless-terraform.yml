@@ -9,10 +9,10 @@ permissions:
   pull-requests: write  # required by terraform
 
 env:
-  TF_CLOUD_ORGANIZATION: "YOUR-ORGANIZATION-HERE"
-  TF_WORKSPACE: "learn-terraform-github-actions"
-  CONFIG_DIRECTORY: "./"
-  # TF_API_TOKEN: "${{ secrets.TF_API_TOKEN }}" <-- do not set this anymore
+  TF_CLOUD_ORGANIZATION: "grib-org1"           # name of the Terraform organization
+  TF_WORKSPACE: "cli"                          # name of the Terraform workspace
+  CONFIG_DIRECTORY: "./"                       # directory in the rpo that has the config files
+  # TF_API_TOKEN: "${{secrets.TF_API_TOKEN}}"  # do NOT set this anymore, Akeyless will do it for you
 
 jobs:
   terraform:
@@ -24,15 +24,15 @@ jobs:
       with:
         fetch-depth: 0
 
-    # THIS GETS YOUR TEAM TOKEN FROM AKEYLESS and exports it into the TF_API_TOKEN environment variable
+    # THIS GETS YOUR TEAM-TOKEN FROM AKEYLESS!
+    # - The static secret is fetched and automatically exported into TF_API_TOKEN
+    # - The 'access-id' is the Auth Method ID from Akeyless (see docs or talk to George Ribarski)
     - name: Fetch static secret from AKeyless
       id: akeyless
       uses: LanceMcCarthy/akeyless-action@v4
       with:
         access-id: 'p-149l6gayzx05'
-        export-secrets-to-outputs: false
-        export-secrets-to-environment: true
-        static-secrets: '{"/DevTools/terraform-team-token-owners":"TF_API_TOKEN"}'
+        static-secrets: '{"/DevTools/terraform-team-token-owners":"TF_API_TOKEN"}'  
 
     - name: Upload Configuration
       uses: hashicorp/tfc-workflows-github/actions/upload-configuration@v1.0.0

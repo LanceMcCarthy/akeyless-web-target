@@ -10,7 +10,7 @@ permissions:
 
 env:
   TF_CLOUD_ORGANIZATION: "grib-org1"           # name of the Terraform organization
-  TF_WORKSPACE: "cli"                          # name of the Terraform workspace
+  TF_WORKSPACE: "api"                          # name of the Terraform workspace
   CONFIG_DIRECTORY: "./"                       # directory in the rpo that has the config files
   # TF_API_TOKEN: "${{secrets.TF_API_TOKEN}}"  # do NOT set this anymore, Akeyless will do it for you
 

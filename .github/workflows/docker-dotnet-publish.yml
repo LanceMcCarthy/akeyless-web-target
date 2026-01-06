@@ -60,11 +60,7 @@ jobs:
 
     - name: create the multi-image manifest
       run: |
-        docker manifest create "${{env.CONTAINER_REG}}/${{env.CONTAINER_REPO}}:latest" \
-          ${{env.CONTAINER_REG}}/${{env.CONTAINER_REPO}}:$X86_TAG \
-          ${{env.CONTAINER_REG}}/${{env.CONTAINER_REPO}}:$ARM64_TAG \
-          ${{env.CONTAINER_REG}}/${{env.CONTAINER_REPO}}:$ARM_TAG
-        
+        docker manifest create "${{env.CONTAINER_REG}}/${{env.CONTAINER_REPO}}:latest" "${{env.CONTAINER_REG}}/${{env.CONTAINER_REPO}}:$X86_TAG" "${{env.CONTAINER_REG}}/${{env.CONTAINER_REPO}}:$ARM64_TAG" "${{env.CONTAINER_REG}}/${{env.CONTAINER_REPO}}:$ARM_TAG"
         docker manifest push "${{env.CONTAINER_REG}}/${{env.CONTAINER_REPO}}:latest"
       env:
         X86_TAG: ${{needs.build.outputs.build_tag[0]}}

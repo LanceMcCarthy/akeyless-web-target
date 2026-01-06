@@ -42,11 +42,24 @@ jobs:
     - name: Login to Docker Hub
       run: docker login ${{env.CONTAINER_REG}} -u ${{secrets.DOCKER_HUB_USERNAME}} -p ${{secrets.DOCKER_HUB_PAT}}
 
-    - name: create the multi-image manifest
+    - name: Create and push a multi-image manifest
       run: |
         docker manifest create "${{env.CONTAINER_REG}}/${{env.CONTAINER_REPO}}:latest" \
-          "${{env.CONTAINER_REG}}/${{env.CONTAINER_REPO}}:x86" \
+          "${{env.CONTAINER_REG}}/${{env.CONTAINER_REPO}}:x64" \
           "${{env.CONTAINER_REG}}/${{env.CONTAINER_REPO}}:arm64" \
           "${{env.CONTAINER_REG}}/${{env.CONTAINER_REPO}}:arm"
-
         docker manifest push "${{env.CONTAINER_REG}}/${{env.CONTAINER_REPO}}:latest"
+
+    - name: Delete old untagged images from Docker Hub
+      run: |
+        TOKEN=$(curl -s -H "Content-Type: application/json" -X POST \
+          -d "{\"username\":\"${{secrets.DOCKER_HUB_USERNAME}}\",\"password\":\"${{secrets.DOCKER_HUB_PAT}}\"}" \
+          https://hub.docker.com/v2/users/login/ | jq -r '.token')
+        
+        curl -s -H "Authorization: Bearer $TOKEN" \
+          -X GET "https://hub.docker.com/v2/repositories/${{env.CONTAINER_REPO}}/tags/?page_size=100" | \
+          jq -r '.results[] | select(.name != "latest" and .name != "x64" and .name != "arm64" and .name != "arm") | .name' | \
+          while read tag; do
+            curl -s -H "Authorization: Bearer $TOKEN" \
+              -X DELETE "https://hub.docker.com/v2/repositories/${{env.CONTAINER_REPO}}/tags/$tag/"
+          done

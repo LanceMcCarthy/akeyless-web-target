@@ -9,21 +9,8 @@ env:
   DOTNET_VER: "10.0.x"
   
 jobs:
-  generate-version:
-    runs-on: ubuntu-latest
-    outputs:
-      version_tag: ${{steps.tag-creator.outputs.VERSION_TAG}}
-    steps:
-    - name: Generate tag version
-      id: tag-creator
-      run: |
-        buildDay=`date +%Y.%m.%d`
-        tags="$buildDay.$GITHUB_RUN_NUMBER"
-        echo "VERSION_TAG=$tags" >> $GITHUB_OUTPUT
-
   build:
     runs-on: ubuntu-latest
-    needs: generate-version
     strategy:
       matrix:
         target_arch: [x64, arm64, arm]
@@ -43,11 +30,11 @@ jobs:
       id: build
       working-directory: src/SecretsMocker/SecretsMocker
       run: |
-        dotnet publish -t:PublishContainer -p PublishProfile=DefaultContainer --arch ${{matrix.target_arch}} -p ContainerImageTag="${{needs.generate-version.outputs.version_tag}}-${{matrix.target_arch}}" -p ContainerRepository=${{env.CONTAINER_REPO}} -p ContainerRegistry=${{env.CONTAINER_REG}} -p ContainerBaseImage=${{env.CONTAINER_BASE_IMAGE}}
+        dotnet publish -t:PublishContainer -p PublishProfile=DefaultContainer --arch ${{matrix.target_arch}} -p ContainerImageTag="${{matrix.target_arch}}" -p ContainerRepository=${{env.CONTAINER_REPO}} -p ContainerRegistry=${{env.CONTAINER_REG}} -p ContainerBaseImage=${{env.CONTAINER_BASE_IMAGE}}
 
   publish_combined_manifest:
     runs-on: ubuntu-22.04
-    needs: [generate-version, build]
+    needs: [build]
     steps:
     - name: Checkout
       uses: actions/checkout@v4
@@ -58,8 +45,8 @@ jobs:
     - name: create the multi-image manifest
       run: |
         docker manifest create "${{env.CONTAINER_REG}}/${{env.CONTAINER_REPO}}:latest" \
-          "${{env.CONTAINER_REG}}/${{env.CONTAINER_REPO}}:${{needs.generate-version.outputs.version_tag}}-x86" \
-          "${{env.CONTAINER_REG}}/${{env.CONTAINER_REPO}}:${{needs.generate-version.outputs.version_tag}}-arm64" \
-          "${{env.CONTAINER_REG}}/${{env.CONTAINER_REPO}}:${{needs.generate-version.outputs.version_tag}}-arm"
+          "${{env.CONTAINER_REG}}/${{env.CONTAINER_REPO}}:x86" \
+          "${{env.CONTAINER_REG}}/${{env.CONTAINER_REPO}}:arm64" \
+          "${{env.CONTAINER_REG}}/${{env.CONTAINER_REPO}}:arm"
 
         docker manifest push "${{env.CONTAINER_REG}}/${{env.CONTAINER_REPO}}:latest"

@@ -3,29 +3,17 @@ on:
   workflow_dispatch:
   
 env:
-  CONTAINER_BASE_IMAGE: "mcr.microsoft.com/dotnet/aspnet:9.0"
+  CONTAINER_BASE_IMAGE: "mcr.microsoft.com/dotnet/aspnet:10.0"
   CONTAINER_REG: "registry.hub.docker.com"
   CONTAINER_REPO: "lancemccarthy/secretsmocker"
-  DOTNET_VER: "9.0.x"
+  DOTNET_VER: "10.0.x"
   
 jobs:
-  build_x64:
-    runs-on: ubuntu-22.04
+  generate-version:
+    runs-on: ubuntu-latest
     outputs:
-      build_tag: ${{steps.build.outputs.build_tag}}
-    env:
-      target_arch: "x64"
+      version_tag: ${{steps.tag-creator.outputs.VERSION_TAG}}
     steps:
-    - name: Checkout
-      uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
-
-    - name: Setup .NET Core SDK
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: ${{env.DOTNET_VER}}
-
     - name: Generate tag version
       id: tag-creator
       run: |
@@ -33,92 +21,39 @@ jobs:
         tags="$buildDay.$GITHUB_RUN_NUMBER"
         echo "VERSION_TAG=$tags" >> $GITHUB_OUTPUT
 
-    - name: Login to Docker Hub
-      run: docker login ${{env.CONTAINER_REG}} -u ${{secrets.DOCKER_HUB_USERNAME}} -p ${{secrets.DOCKER_HUB_PAT}}
-
-    - name: build the x64 image
-      id: build
-      working-directory: src/SecretsMocker/SecretsMocker
-      run: |
-        dotnet publish -t:PublishContainer -p PublishProfile=DefaultContainer --arch ${{env.target_arch}} -p ContainerImageTag="${{steps.tag-creator.outputs.VERSION_TAG}}-${{env.target_arch}}" -p ContainerRepository=${{env.CONTAINER_REPO}} -p ContainerRegistry=${{env.CONTAINER_REG}} -p ContainerBaseImage=${{env.CONTAINER_BASE_IMAGE}}
-        echo "build_tag=${{steps.tag-creator.outputs.VERSION_TAG}}-${{env.target_arch}}" >> $GITHUB_OUTPUT
-
-  build_arm64:
-    runs-on: ubuntu-22.04
+  build:
+    runs-on: ubuntu-latest
+    needs: generate-version
     outputs:
       build_tag: ${{steps.build.outputs.build_tag}}
-    env:
-      target_arch: "arm64"
+    strategy:
+      matrix:
+        target_arch: [x64, arm64, arm]
     steps:
     - name: Checkout
       uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
 
     - name: Setup .NET Core SDK
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: ${{env.DOTNET_VER}}
 
-    - name: Generate tag version
-      id: tag-creator
-      run: |
-        buildDay=`date +%Y.%m.%d`
-        tags="$buildDay.$GITHUB_RUN_NUMBER"
-        echo "VERSION_TAG=$tags" >> $GITHUB_OUTPUT
-
     - name: Login to Docker Hub
       run: docker login ${{env.CONTAINER_REG}} -u ${{secrets.DOCKER_HUB_USERNAME}} -p ${{secrets.DOCKER_HUB_PAT}}
 
-    - name: build the arm64 image
+    - name: Build the ${{matrix.target_arch}} image
       id: build
       working-directory: src/SecretsMocker/SecretsMocker
       run: |
-        dotnet publish -t:PublishContainer -p PublishProfile=DefaultContainer --arch ${{env.target_arch}} -p ContainerImageTag="${{steps.tag-creator.outputs.VERSION_TAG}}-${{env.target_arch}}" -p ContainerRepository=${{env.CONTAINER_REPO}} -p ContainerRegistry=${{env.CONTAINER_REG}} -p ContainerBaseImage=${{env.CONTAINER_BASE_IMAGE}}
-        echo "build_tag=${{steps.tag-creator.outputs.VERSION_TAG}}-${{env.target_arch}}" >> $GITHUB_OUTPUT
-
-  build_arm:
-    runs-on: ubuntu-22.04
-    outputs:
-      build_tag: ${{steps.build.outputs.build_tag}}
-    env:
-      target_arch: "arm"
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
-
-    - name: Setup .NET Core SDK
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: ${{env.DOTNET_VER}}
-
-    - name: Generate tag version
-      id: tag-creator
-      run: |
-        buildDay=`date +%Y.%m.%d`
-        tags="$buildDay.$GITHUB_RUN_NUMBER"
-        echo "VERSION_TAG=$tags" >> $GITHUB_OUTPUT
-
-    - name: Login to Docker Hub
-      run: docker login ${{env.CONTAINER_REG}} -u ${{secrets.DOCKER_HUB_USERNAME}} -p ${{secrets.DOCKER_HUB_PAT}}
-
-    - name: build the arm image
-      id: build
-      working-directory: src/SecretsMocker/SecretsMocker
-      run: |
-        dotnet publish -t:PublishContainer -p PublishProfile=DefaultContainer --arch ${{env.target_arch}} -p ContainerImageTag="${{steps.tag-creator.outputs.VERSION_TAG}}-${{env.target_arch}}" -p ContainerRepository=${{env.CONTAINER_REPO}} -p ContainerRegistry=${{env.CONTAINER_REG}} -p ContainerBaseImage=${{env.CONTAINER_BASE_IMAGE}}
-        echo "build_tag=${{steps.tag-creator.outputs.VERSION_TAG}}-${{env.target_arch}}" >> $GITHUB_OUTPUT
+        dotnet publish -t:PublishContainer -p PublishProfile=DefaultContainer --arch ${{matrix.target_arch}} -p ContainerImageTag="${{needs.generate-version.outputs.version_tag}}-${{matrix.target_arch}}" -p ContainerRepository=${{env.CONTAINER_REPO}} -p ContainerRegistry=${{env.CONTAINER_REG}} -p ContainerBaseImage=${{env.CONTAINER_BASE_IMAGE}}
+        echo "build_tag=${{needs.generate-version.outputs.version_tag}}-${{matrix.target_arch}}" >> $GITHUB_OUTPUT
 
   publish_combined_manifest:
     runs-on: ubuntu-22.04
-    needs: [build_x64, build_arm64, build_arm]
+    needs: build
     steps:
     - name: Checkout
       uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
 
     - name: Login to Docker Hub
       run: docker login ${{env.CONTAINER_REG}} -u ${{secrets.DOCKER_HUB_USERNAME}} -p ${{secrets.DOCKER_HUB_PAT}}
@@ -132,6 +67,6 @@ jobs:
         
         docker manifest push "${{env.CONTAINER_REG}}/${{env.CONTAINER_REPO}}:latest"
       env:
-        X86_TAG: ${{needs.build_x64.outputs.build_tag}}
-        ARM64_TAG: ${{needs.build_arm64.outputs.build_tag}}
-        ARM_TAG: ${{needs.build_arm.outputs.build_tag}}
+        X86_TAG: ${{needs.build.outputs.build_tag[0]}}
+        ARM64_TAG: ${{needs.build.outputs.build_tag[1]}}
+        ARM_TAG: ${{needs.build.outputs.build_tag[2]}}
